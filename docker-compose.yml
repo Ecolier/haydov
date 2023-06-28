@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  auth:
+    image: quay.io/keycloak/keycloak:21.1.2
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - 8080:8080

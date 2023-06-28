@@ -1,0 +1,22 @@
+{
+  "name": "@haydov/haydov",
+  "version": "0.0.1",
+  "description": "Carpooling in Central Asia",
+  "main": "index.js",
+  "repository": "https://github.com/ecolier/haydov",
+  "author": "Evan Gruère <evan.gruere@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "yarn@3.6.0",
+  "workspaces": [
+    "packages/**/*",
+    "services/**/*",
+    "app"
+  ],
+  "devDependencies": {
+    "eslint": "^8.43.0",
+    "jest": "^29.5.0",
+    "lerna": "^7.1.0",
+    "prettier": "^2.8.8"
+  }
+}
