@@ -23,8 +23,6 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
 			<key>CFBundleURLName</key>
 			<string>com.ecolier.haydov</string>
 			<key>CFBundleURLSchemes</key>
@@ -84,16 +82,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleURLName</key>
-      <string>com.ecolier.haydov</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>haydov</string>
-      </array>
-    </dict>
-  </array>
 </dict>
 </plist>
