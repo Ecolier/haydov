@@ -1,5 +1,14 @@
 version: "3"
 
 services:
+
   auth:
     command: start-dev
+
+  auth-db:
+    environment:
+      POSTGRES_PASSWORD: admin
+
+  api-db:
+    environment:
+      POSTGRES_PASSWORD: admin

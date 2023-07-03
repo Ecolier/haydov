@@ -1,10 +1,53 @@
 version: "3"
 
 services:
+
+  auth-db:
+    image: postgres:15.3
+    restart: always
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  api-db:
+    image: postgres:15.3
+    restart: always
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: api
+    volumes:
+      - api_db_data:/var/lib/postgresql/data
+
   auth:
     image: quay.io/keycloak/keycloak:21.1.2
+    depends_on:
+      - auth-db
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://auth-db/keycloak
+      KC_DB_USER: keycloak
+      KC_DB_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
-      - 8080:8080
+      - ${HAYDOV_AUTH_PORT}:8080
+
+  graphql-engine:
+    image: hasura/graphql-engine:v2.28.1
+    ports:
+    - ${HAYDOV_API_PORT}:8080
+    depends_on:
+    - api-db
+    - auth
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://api:admin@api-db:5432/api
+      HASURA_GRAPHQL_ENABLE_CONSOLE: true
+      HASURA_GRAPHQL_ADMIN_SECRET: admin
+      HASURA_GRAPHQL_JWT_SECRET: "{\"jwk_url\": \"${HAYDOV_API_JWKS_URI}\"}"
+
+volumes:
+  auth_db_data:
+  api_db_data:
