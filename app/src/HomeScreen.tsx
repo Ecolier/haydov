@@ -5,10 +5,12 @@ import {useQuery} from '@apollo/client';
 import {Text} from 'react-native-paper';
 
 function HomeScreen(): JSX.Element {
-  const {data} = useQuery(GET_USER);
+  const {error, data} = useQuery(GET_USER);
   return (
     <SafeAreaView>
-      <Text>{data?.users[0]?.username}</Text>
+      <Text>
+        {data?.users[0]?.username ? data?.users[0]?.username : error?.message}
+      </Text>
     </SafeAreaView>
   );
 }
