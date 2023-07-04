@@ -21,7 +21,9 @@ services:
       - api_db_data:/var/lib/postgresql/data
 
   auth:
-    image: quay.io/keycloak/keycloak:21.1.2
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
     depends_on:
       - auth-db
     environment:
@@ -31,6 +33,8 @@ services:
       KC_DB_PASSWORD: admin
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./auth:/opt/keycloak/themes/haydov
     ports:
       - ${HAYDOV_AUTH_PORT}:8080
 

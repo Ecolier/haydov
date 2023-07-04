@@ -3,7 +3,9 @@ version: "3"
 services:
 
   auth:
-    command: start-dev
+    build:
+      args:
+        NODE_ENV: ${NODE_ENV}
 
   auth-db:
     environment:
