@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ory from '../ory';
 import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
+
+import ory from '@/ory';
 
 export default function Home() {
   const [session, setSession] = useState<string>(
@@ -39,7 +40,7 @@ export default function Home() {
   }, [router])
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      
+      Hello world
     </main>
   )
 }

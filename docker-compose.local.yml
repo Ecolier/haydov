@@ -2,6 +2,12 @@ version: "3"
 
 services:
 
+  accounts: 
+    volumes:
+      - ./accounts/src:/app/accounts/src
+      - ./accounts/public:/app/accounts/public
+      - ./accounts/.env.local:/app/accounts/.env.local
+
   auth:
     build:
       args:

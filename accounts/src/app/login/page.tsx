@@ -1,45 +1,72 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import ory from '../../ory';
-import { useRouter } from 'next/navigation';
-import { AxiosError } from 'axios';
+import { LoginFlow, UpdateLoginFlowBody } from "@ory/client"
+import { AxiosError } from "axios"
+import type { NextPage } from "next"
+import Head from "next/head"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, useTransition } from "react"
+import ory from '@/ory';
+import { handleGetFlowError, handleFlowError } from "@/errors"
+import { LogoutLink } from "@/logout";
+import { FlowProvider } from "@/flow";
+import useLogin from "@/hooks/use-login";
+import { Flow } from "./flow";
 
-export default function Home() {
-  const [session, setSession] = useState<string>(
-    "No valid Ory Session was found.\nPlease sign in to receive one.",
-  )
-  const [hasSession, setHasSession] = useState<boolean>(false);
+type Props = {
+  searchParams: {
+    return_to?: string;
+    flow?: string;
+    refresh?: string;
+    aal?: string;
+  };
+};
+
+export default function Login({ searchParams }: Props) {
+  const [flow, setFlow] = useState<LoginFlow>();
   const router = useRouter();
-  useEffect(() => {
-    ory
-      .toSession()
-      .then(({ data }) => {
-        setSession(JSON.stringify(data, null, 2))
-        setHasSession(true)
+  const {
+    return_to: returnTo,
+    flow: flowId,
+    refresh,
+    aal,
+  } = searchParams;
+
+  useLogin(flow, {
+    flowId: flowId ? String(flowId) : undefined,
+    returnTo: returnTo ? String(returnTo) : undefined,
+    aal: aal ? String(aal) : undefined,
+    refresh: Boolean(refresh),
+  }, setFlow);
+
+  const onSubmit = (values: UpdateLoginFlowBody) => {
+    history.pushState(null, '', `/login?flow=${flow?.id}`);
+    return ory.updateLoginFlow({
+        flow: String(flow?.id),
+        updateLoginFlowBody: values,
+      })
+      .then(() => {
+        if (flow?.return_to) {
+          window.location.href = flow?.return_to;
+          return
+        }
+        router.push("/")
       })
       .catch((err: AxiosError) => {
-        switch (err.response?.status) {
-          case 403:
-          // This is a legacy error code thrown. See code 422 for
-          // more details.
-          case 422:
-            // This status code is returned when we are trying to
-            // validate a session which has not yet completed
-            // its second factor
-            return router.push("/login?aal=aal2")
-          case 401:
-            // do nothing, the user is not logged in
-            return
+        // If the previous handler did not catch the error it's most likely a form validation error
+        if (err.response?.status === 400) {
+          // Yup, it is!
+          setFlow(err.response?.data)
+          return
         }
-
-        // Something else happened!
         return Promise.reject(err)
       })
-  }, [router])
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      Hello
-    </main>
+    <FlowProvider type="login" reset={() => setFlow(undefined)}>
+      <Flow onSubmit={onSubmit} flow={flow} />
+    </FlowProvider>
   )
 }
