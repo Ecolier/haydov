@@ -6,10 +6,26 @@ services:
     image: postgres:15.3
     restart: always
     environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
+      POSTGRES_DB: hydra
+      POSTGRES_USER: hydra
     volumes:
       - auth_db_data:/var/lib/postgresql/data
+    
+  kratos-db:
+    image: postgres:15.3
+    restart: always
+    environment:
+      POSTGRES_DB: kratos
+      POSTGRES_USER: kratos
+    volumes:
+      - kratos_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intranet
 
   api-db:
     image: postgres:15.3
@@ -21,24 +37,59 @@ services:
       - api_db_data:/var/lib/postgresql/data
 
   auth:
-    build:
-      context: .
-      dockerfile: ./auth/Dockerfile
+    image: oryd/hydra:v2.2.0
     depends_on:
       - auth-db
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://auth-db/keycloak
-      KC_DB_USER: keycloak
-      KC_DB_PASSWORD: admin
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    volumes:
-      - ./auth:/opt/keycloak/themes/haydov
-    ports:
-      - ${HAYDOV_AUTH_PORT}:8080
+      DSN: postgres://hydra:admin@auth-db:5432/hydra?sslmode=disable
 
-  graphql-engine:
+  kratos-migrate:
+    image: oryd/kratos:v0.13.0
+    depends_on:
+      kratos-db: 
+        condition: service_healthy
+    environment:
+      - DSN=postgres://kratos:admin@kratos-db:5432/kratos?sslmode=disable
+    volumes:
+      - type: bind
+        source: ./kratos
+        target: /etc/config/kratos
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - intranet
+
+  kratos:
+    depends_on:
+      - kratos-migrate
+    image: oryd/kratos:v0.13.0
+    ports:
+      - '4433:4433'
+      - '4434:4434'
+    restart: unless-stopped
+    environment:
+      - DSN=postgres://kratos:admin@kratos-db:5432/kratos?sslmode=disable
+      - LOG_LEVEL=trace
+    command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
+    volumes:
+      - type: bind
+        source: ./kratos
+        target: /etc/config/kratos
+    networks:
+      - intranet
+  
+  accounts:
+    build: 
+      context: .
+      dockerfile: ./accounts/Dockerfile
+    environment:
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+    networks:
+      - intranet
+    restart: on-failure
+
+  api:
     image: hasura/graphql-engine:v2.28.1
     ports:
     - ${HAYDOV_API_PORT}:8080
@@ -55,3 +106,7 @@ services:
 volumes:
   auth_db_data:
   api_db_data:
+  kratos_db_data:
+
+networks:
+  intranet:

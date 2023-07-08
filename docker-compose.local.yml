@@ -14,3 +14,7 @@ services:
   api-db:
     environment:
       POSTGRES_PASSWORD: admin
+
+  kratos-db:
+    environment:
+      POSTGRES_PASSWORD: admin

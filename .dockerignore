@@ -4,17 +4,8 @@
 !.yarnrc.yml
 !package.json
 !yarn.lock
-!tsconfig.json
-!lerna.json
 
-!services/**/src
-!services/**/package.json
-!services/**/tsconfig.json
-!services/**/nodemon.json
-
-!packages/**/src
-!packages/**/package.json
-!packages/**/tsconfig.json
+!accounts/
 
 **/*~
 **/*.log
