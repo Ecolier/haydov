@@ -91,6 +91,8 @@ services:
       - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
     networks:
       - intranet
+    depends_on:
+      - kratos
     restart: on-failure
 
   api:

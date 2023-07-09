@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Sun, 09 Jul 2023 13:04:06 GMT
+ * Generated on Sun, 09 Jul 2023 13:28:02 GMT
  */
 
 export const ColorBaseGrayLight = "#cccccc";
