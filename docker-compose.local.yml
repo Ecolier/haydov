@@ -4,9 +4,8 @@ services:
 
   accounts: 
     volumes:
-      - ./accounts/src:/app/accounts/src
-      - ./accounts/public:/app/accounts/public
-      - ./accounts/.env.local:/app/accounts/.env.local
+      - ./accounts:/app/accounts
+      - ./theme:/app/theme
 
   auth:
     build:

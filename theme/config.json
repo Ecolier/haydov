@@ -1,0 +1,21 @@
+{
+  "platforms": {
+    "scss": {
+      "transformGroup": "scss",
+      "buildPath": "./dist/",
+      "prefix": "token",
+      "files": [{
+        "destination": "variables.scss",
+        "format": "scss/variables"
+      }]
+    },
+    "js": {
+      "transformGroup": "js",
+      "buildPath": "./dist/",
+      "files": [{
+        "destination": "variables.js",
+        "format": "javascript/es6"
+      }]
+    }
+  }
+}

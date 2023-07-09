@@ -2,17 +2,13 @@
 
 import { LoginFlow, UpdateLoginFlowBody } from "@ory/client"
 import { AxiosError } from "axios"
-import type { NextPage } from "next"
-import Head from "next/head"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useTransition } from "react"
+import { useState }from "react"
 import ory from '@/ory';
-import { handleGetFlowError, handleFlowError } from "@/errors"
-import { LogoutLink } from "@/logout";
-import { FlowProvider } from "@/flow";
+import { FlowProvider } from "@/FlowProvider";
 import useLogin from "@/hooks/use-login";
-import { Flow } from "./flow";
+import Flow from "@/Flow";
+import {ColorFontSecondary} from "@/tokens";
 
 type Props = {
   searchParams: {
@@ -41,7 +37,7 @@ export default function Login({ searchParams }: Props) {
   }, setFlow);
 
   const onSubmit = (values: UpdateLoginFlowBody) => {
-    history.pushState(null, '', `/login?flow=${flow?.id}`);
+    router.push(`/login?flow=${flow?.id}`);
     return ory.updateLoginFlow({
         flow: String(flow?.id),
         updateLoginFlowBody: values,
@@ -64,9 +60,11 @@ export default function Login({ searchParams }: Props) {
       })
   }
 
+  console.log(ColorFontSecondary);
+
   return (
     <FlowProvider type="login" reset={() => setFlow(undefined)}>
-      <Flow onSubmit={onSubmit} flow={flow} />
+      {flow && <Flow flow={flow}></Flow>}
     </FlowProvider>
   )
 }

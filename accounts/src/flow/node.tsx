@@ -8,7 +8,7 @@ import {
 } from "@ory/integrations/ui"
 
 import { FormDispatcher, ValueSetter } from "./helpers"
-import { NodeAnchor } from "./node-anchor"
+import { NodeAnchor } from "../NodeAnchor"
 import { NodeImage } from "./node-image"
 import { NodeInput } from "./node-input"
 import { NodeScript } from "./node-script"

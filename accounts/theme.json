@@ -1,0 +1,16 @@
+{
+  "platforms": {
+    "scss": {
+      "buildPath": "./src/",
+      "files": [{
+        "destination": "tokens.scss"
+      }]
+    },
+    "js": {
+      "buildPath": "./src/",
+      "files": [{
+        "destination": "tokens.js"
+      }]
+    }
+  }
+}

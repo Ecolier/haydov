@@ -8,11 +8,13 @@ WORKDIR /app
 COPY package.json yarn.lock* ./
 COPY .yarn ./.yarn
 COPY accounts/package.json ./accounts/
-RUN yarn install --immutable 
+COPY theme ./theme
+RUN --mount=type=cache,target=./.yarn YARN_CACHE_FOLDER=./.yarn yarn install --immutable --immutable-cache --check-cache
 
 FROM base AS builder-production
 WORKDIR /app
 COPY accounts ./accounts
+COPY theme ./theme
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/.yarn ./.yarn
 COPY --from=deps /app/yarn.lock /app/package.json ./
@@ -40,6 +42,7 @@ WORKDIR /app
 ENV NODE_ENV development
 ENV NEXT_TELEMETRY_DISABLED 1
 COPY --from=deps /app ./
+COPY theme ./theme
 COPY accounts ./accounts
 EXPOSE 3000
 ENV PORT 3000

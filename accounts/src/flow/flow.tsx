@@ -10,12 +10,12 @@ import {
   UpdateSettingsFlowBody,
   UpdateVerificationFlowBody,
   VerificationFlow,
-} from "@ory/client"
-import { getNodeId, isUiNodeInputAttributes } from "@ory/integrations/ui"
-import { Component, FormEvent, MouseEvent } from "react"
+} from '@ory/client'
+import { getNodeId, isUiNodeInputAttributes } from '@ory/integrations/ui'
+import { Component, FormEvent, MouseEvent } from 'react'
 
-import { Messages } from "./messages"
-import { Node } from "./node"
+import { Messages } from './messages'
+import { Node } from './node'
 
 export type Values = Partial<
   | UpdateLoginFlowBody
@@ -26,27 +26,23 @@ export type Values = Partial<
 >
 
 export type Methods =
-  | "oidc"
-  | "password"
-  | "profile"
-  | "totp"
-  | "webauthn"
-  | "link"
-  | "lookup_secret"
+  | 'oidc'
+  | 'password'
+  | 'profile'
+  | 'totp'
+  | 'webauthn'
+  | 'link'
+  | 'lookup_secret'
 
 export type Props<T> = {
-  // The flow
   flow?:
     | LoginFlow
     | RegistrationFlow
     | SettingsFlow
     | VerificationFlow
     | RecoveryFlow
-  // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods
-  // Is triggered on submission
   onSubmit: (values: T) => Promise<void>
-  // Do not show the global messages. Useful when rendering them elsewhere.
   hideGlobalMessages?: boolean
 }
 
@@ -86,8 +82,8 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       // This only makes sense for text nodes
       if (isUiNodeInputAttributes(node.attributes)) {
         if (
-          node.attributes.type === "button" ||
-          node.attributes.type === "submit"
+          node.attributes.type === 'button' ||
+          node.attributes.type === 'submit'
         ) {
           // In order to mimic real HTML forms, we need to skip setting the value
           // for buttons as the button value will (in normal HTML forms) only trigger
@@ -111,7 +107,7 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       if (!only) {
         return true
       }
-      return group === "default" || group === only
+      return group === 'default' || group === only
     })
   }
 
@@ -137,7 +133,7 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       body = Object.fromEntries(formData) as T
 
       const hasSubmitter = (evt: any): evt is { submitter: HTMLInputElement } =>
-        "submitter" in evt
+        'submitter' in evt
 
       // We need the method specified from the name and value of the submit button.
       // when multiple submit buttons are present, the clicked one's value is used.
