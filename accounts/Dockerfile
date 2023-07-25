@@ -5,11 +5,15 @@ FROM node:18-alpine AS base
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json yarn.lock* ./
-COPY .yarn ./.yarn
+
+COPY package.json yarn.lock* .yarnrc.yml ./
+COPY .yarn/releases ./.yarn/releases
+COPY .yarn/plugins ./.yarn/plugins
+
 COPY accounts/package.json ./accounts/
-COPY theme ./theme
-RUN --mount=type=cache,target=./.yarn YARN_CACHE_FOLDER=./.yarn yarn install --immutable --immutable-cache --check-cache
+COPY theme/package.json ./theme/
+
+RUN --mount=type=cache,target=/root/.yarn YARN_CACHE_FOLDER=/root/.yarn yarn install
 
 FROM base AS builder-production
 WORKDIR /app

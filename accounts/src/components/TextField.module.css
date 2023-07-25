@@ -1,0 +1,4 @@
+.input {
+  border-radius: var(--hdv-sys-shape-corner-extra-small);
+  border: 1px solid var(--hdv-sys-color-outline);
+}

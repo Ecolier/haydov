@@ -2,7 +2,7 @@ import {UiNode} from '@ory/client';
 import {
   isUiNodeInputAttributes,
 } from '@ory/integrations/ui'
-import { TextInput } from './components/TextInput';
+import { TextField } from './components/TextField';
 
 type FlowProps = {
   node: UiNode;
@@ -13,7 +13,7 @@ export default function Node({node}: FlowProps) {
   if (isUiNodeInputAttributes(attributes)) {
     switch (attributes.type) {
       case 'text': 
-        return <TextInput />
+        return <TextField />
     }
   }
 }

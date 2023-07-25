@@ -1,0 +1,76 @@
+/**
+ * Do not edit directly
+ * Generated on Tue, 25 Jul 2023 12:52:11 GMT
+ */
+
+:root {
+  --hdv-ref-palette-primary-0: #000000; /* Primary 0 */
+  --hdv-ref-palette-primary-10: #010828; /* Primary 10 */
+  --hdv-ref-palette-primary-20: #06203f; /* Primary 20 */
+  --hdv-ref-palette-primary-30: #4f378b; /* Primary 30 */
+  --hdv-ref-palette-primary-40: #12385b; /* Primary 40 */
+  --hdv-ref-palette-primary-50: #184a6e; /* Primary 50 */
+  --hdv-ref-palette-primary-60: #2f6b8c; /* Primary 60 */
+  --hdv-ref-palette-primary-70: #558da5; /* Primary 70 */
+  --hdv-ref-palette-primary-80: #7fadbc; /* Primary 80 */
+  --hdv-ref-palette-primary-90: #a8cdd4; /* Primary 90 */
+  --hdv-ref-palette-primary-95: #d3e7eb; /* Primary 95 */
+  --hdv-ref-palette-primary-99: #eaf1f3; /* Primary 99 */
+  --hdv-ref-palette-primary-100: #ffffff; /* Primary 100 */
+  --hdv-ref-palette-secondary-0: #000000; /* Secondary 0 */
+  --hdv-ref-palette-secondary-10: #1e1d1d; /* Secondary 10 */
+  --hdv-ref-palette-secondary-20: #363431; /* Secondary 20 */
+  --hdv-ref-palette-secondary-30: #575549; /* Secondary 30 */
+  --hdv-ref-palette-secondary-40: #716c56; /* Secondary 40 */
+  --hdv-ref-palette-secondary-50: #907d55; /* Secondary 50 */
+  --hdv-ref-palette-secondary-60: #9e8758; /* Secondary 60 */
+  --hdv-ref-palette-secondary-70: #b3924f; /* Secondary 70 */
+  --hdv-ref-palette-secondary-80: #cea552; /* Secondary 80 */
+  --hdv-ref-palette-secondary-90: #e8bf6e; /* Secondary 90 */
+  --hdv-ref-palette-secondary-95: #f5dba7; /* Secondary 95 */
+  --hdv-ref-palette-secondary-99: #fdedcd; /* Secondary 99 */
+  --hdv-ref-palette-secondary-100: #ffffff; /* Secondary 100 */
+  --hdv-ref-palette-error-0: #000000; /* Error 0 */
+  --hdv-ref-palette-error-10: #250217; /* Error 10 */
+  --hdv-ref-palette-error-20: #3d0e1f; /* Error 20 */
+  --hdv-ref-palette-error-30: #562534; /* Error 30 */
+  --hdv-ref-palette-error-40: #712d3d; /* Error 40 */
+  --hdv-ref-palette-error-50: #924058; /* Error 50 */
+  --hdv-ref-palette-error-60: #a65d77; /* Error 60 */
+  --hdv-ref-palette-error-70: #c17a90; /* Error 70 */
+  --hdv-ref-palette-error-80: #dd9db0; /* Error 80 */
+  --hdv-ref-palette-error-90: #eccbd5; /* Error 90 */
+  --hdv-ref-palette-error-95: #f4e4e9; /* Error 95 */
+  --hdv-ref-palette-error-99: #fdf9fa; /* Error 99 */
+  --hdv-ref-palette-error-100: #ffffff; /* Error 100 */
+  --hdv-ref-palette-neutral-variant-0: #000000; /* Neutral Variant 0 */
+  --hdv-ref-palette-neutral-variant-10: #1d1a22; /* Neutral Variant 10 */
+  --hdv-ref-palette-neutral-variant-20: #322f37; /* Neutral Variant 20 */
+  --hdv-ref-palette-neutral-variant-30: #49454f; /* Neutral Variant 30 */
+  --hdv-ref-palette-neutral-variant-40: #605d66; /* Neutral Variant 40 */
+  --hdv-ref-palette-neutral-variant-50: #79747e; /* Neutral Variant 50 */
+  --hdv-ref-palette-neutral-variant-60: #938f99; /* Neutral Variant 60 */
+  --hdv-ref-palette-neutral-variant-70: #aea9b4; /* Neutral Variant 70 */
+  --hdv-ref-palette-neutral-variant-80: #cac4d0; /* Neutral Variant 80 */
+  --hdv-ref-palette-neutral-variant-90: #e7e0ec; /* Neutral Variant 90 */
+  --hdv-ref-palette-neutral-variant-95: #f5eefa; /* Neutral Variant 95 */
+  --hdv-ref-palette-neutral-variant-99: #fffbfe; /* Neutral Variant 99 */
+  --hdv-ref-palette-neutral-variant-100: #ffffff; /* Neutral Variant 100 */
+  --hdv-ref-palette-neutral-0: #000000; /* Neutral 0 */
+  --hdv-ref-palette-neutral-10: #1c1b1f; /* Neutral 10 */
+  --hdv-ref-palette-neutral-20: #313033; /* Neutral 20 */
+  --hdv-ref-palette-neutral-30: #484649; /* Neutral 30 */
+  --hdv-ref-palette-neutral-40: #605d62; /* Neutral 40 */
+  --hdv-ref-palette-neutral-50: #787579; /* Neutral 50 */
+  --hdv-ref-palette-neutral-60: #939094; /* Neutral 60 */
+  --hdv-ref-palette-neutral-70: #aeaaae; /* Neutral 70 */
+  --hdv-ref-palette-neutral-80: #c9c5ca; /* Neutral 80 */
+  --hdv-ref-palette-neutral-90: #e6e1e5; /* Neutral 90 */
+  --hdv-ref-palette-neutral-95: #f4eff4; /* Neutral 95 */
+  --hdv-ref-palette-neutral-99: #fffbfe; /* Neutral 99 */
+  --hdv-ref-palette-neutral-100: #ffffff; /* Neutral 100 */
+  --hdv-ref-palette-black: #000000; /* Black */
+  --hdv-ref-palette-white: #ffffff; /* White */
+  --hdv-sys-color-outline: #79747e; /* Outline Color */
+  --hdv-sys-shape-corner-extra-small: 4px; /* Extra small */
+}
