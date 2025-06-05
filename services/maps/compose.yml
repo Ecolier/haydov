@@ -1,0 +1,10 @@
+include:
+  - ../routing/compose.yml
+  - ../geocoding/compose.yml
+
+services:
+  maps:
+    build: ./
+    depends_on:
+      - routing
+      - geocoding

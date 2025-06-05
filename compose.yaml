@@ -1,9 +1,2 @@
-services:
-  routing:
-    build:
-      context: ./services/routing
-    ports:
-      - 8002:8002
-
-volumes:
-  routing:
+include:
+  - services/maps/compose.yml

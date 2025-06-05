@@ -1,6 +1,3 @@
-networks:
-  default:
-    driver: bridge
 services:
   libpostal:
     image: pelias/libpostal-service
@@ -14,7 +11,7 @@ services:
     user: "${DOCKER_USER}"
     volumes:
       - "./pelias.json:/code/pelias.json"
-  api:
+  geocoding:
     image: pelias/api:master
     container_name: pelias_api
     user: "${DOCKER_USER}"
