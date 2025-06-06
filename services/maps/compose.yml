@@ -4,7 +4,11 @@ include:
 
 services:
   maps:
-    build: ./
+    build: 
+      context: ./
+      target: production
     depends_on:
       - routing
       - geocoding
+    ports:
+      - 3000:3000

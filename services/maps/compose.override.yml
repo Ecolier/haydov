@@ -1,0 +1,10 @@
+services:
+  maps:
+    tty: true        
+    build:
+      target: development
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/src/maps/src
