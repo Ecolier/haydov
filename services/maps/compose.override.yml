@@ -1,6 +1,6 @@
 services:
   maps:
-    tty: true        
+    tty: true
     build:
       target: development
     develop:
