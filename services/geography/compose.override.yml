@@ -1,0 +1,4 @@
+services:
+  io:
+    labels:
+      - "traefik.http.routers.haydov.rule=Host(`geography.haydov.localhost`)"
