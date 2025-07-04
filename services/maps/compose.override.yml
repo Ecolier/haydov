@@ -8,3 +8,5 @@ services:
         - action: sync
           path: ./src
           target: /usr/src/maps/src
+    labels:
+      - "traefik.http.routers.haydov.rule=Host(`maps.haydov.localhost`)"

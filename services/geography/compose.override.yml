@@ -1,4 +1,18 @@
 services:
+  geography:
+    build:
+      context: ./
+      target: development
+    env_file: .env
+    tty: true
+    stdin_open: true
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+    ports:
+      - 3000:3000
   io:
     labels:
       - "traefik.http.routers.haydov.rule=Host(`geography.haydov.localhost`)"

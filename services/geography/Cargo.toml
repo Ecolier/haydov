@@ -3,7 +3,19 @@ name = "geography"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "pull"
+path = "src/pull.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
 [dependencies]
 axum = "0.8.4"
+config = "0.15.11"
+libloading = "0.8.8"
+minio = "0.3.0"
+reqwest = {version = "0.12.22", features = ["blocking"] }
 tokio = { version = "1.45.1", features = ["full"] }
 tower = "0.5.2"

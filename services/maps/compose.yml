@@ -1,14 +1,13 @@
 include:
-  - ../routing/compose.yml
   - ../geocoding/compose.yml
+  - ../routing/compose.yml
 
 services:
   maps:
     build: 
       context: ./
-      target: production
-    depends_on:
-      - routing
-      - geocoding
     ports:
       - 3000:3000
+    depends_on:
+      - geocoding
+      - routing
