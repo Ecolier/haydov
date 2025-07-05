@@ -2,11 +2,15 @@
   "regions": [
     {
       "name": "Europe",
-      "path": "europe",
+      "path": "europe/",
       "regions": [
         {
+          "name": "Montenegro",
+          "file": "montenegro-latest.osm.pbf"
+        },
+        {
           "name": "France",
-          "path": "france",
+          "path": "france/",
           "regions": [
             {
               "name": "Rhônes-Alpes",
@@ -26,7 +30,7 @@
     },
     {
       "name": "Asia",
-      "path": "asia",
+      "path": "asia/",
       "regions": [
         {
           "name": "Afghanistan",
