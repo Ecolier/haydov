@@ -648,8 +648,10 @@ dependencies = [
  "libloading",
  "minio",
  "reqwest",
+ "serde",
  "tokio",
  "tower",
+ "url",
 ]
 
 [[package]]
