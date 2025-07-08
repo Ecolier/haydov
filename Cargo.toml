@@ -1,3 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["services/maps", "services/geography"]
+members = [
+  "services/maps", 
+  "services/osm"
+]
