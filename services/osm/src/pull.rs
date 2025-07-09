@@ -1,26 +1,20 @@
-#![allow(warnings)]
-
 use std::sync::Arc;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use aws_config::Region;
 use aws_sdk_s3::{
     config::Credentials,
-    operation::upload_part::UploadPart,
     primitives::ByteStream,
-    types::{CompletedMultipartUpload, CompletedPart, builders::CompletedPartBuilder},
+    types::{CompletedMultipartUpload, CompletedPart},
 };
 use bytes::BytesMut;
 use config;
 use futures_util::{StreamExt, TryStreamExt, stream};
-use log::{error, info};
 
 mod download;
 mod errors;
 mod region;
 mod settings;
-
-use settings::Settings;
 
 // Default values for concurrent requests and chunk size
 // These values can be overridden by the configuration file or environment variables.
@@ -29,6 +23,7 @@ const CHUNK_SIZE: usize = 5 * 1024 * 1024;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+
     // Load configuration from config.json and environment variables
     let config = config::Config::builder()
         .add_source(config::File::with_name("config.json"))
@@ -61,43 +56,48 @@ async fn main() -> Result<()> {
 
     let storage_client = Arc::new(aws_sdk_s3::Client::from_conf(s3_config));
 
-    // let bucket = match storage_client
-    //     .create_bucket()
-    //     .bucket(&config.bucket_name)
-    //     .send()
-    //     .await {
-    //     Ok(_) => {
-    //         info!("Bucket {} created successfully.", config.bucket_name);
-    //         &config.bucket_name
-    //     }
-    //     Err(e) => {
-    //         error!("Failed to create bucket {}: {}", &config.bucket_name, e);
-    //         return Err(e.into());
-    //     }
-    // };
+    // Check if the bucket exists, if not, create it
+    let exists = match storage_client.head_bucket()
+        .bucket(&config.bucket_name)
+        .send()
+        .await
+    {
+        Ok(_) => true,
+        Err(err) => {
+            match err.as_service_error().map(|e| e.is_not_found()) {
+                Some(true) => false,
+                _ => return Err(anyhow::Error::from(err)),
+            }
+        }
+    };
 
-    // Use default values for concurrent requests and chunk size if not provided
+    if !exists {
+        storage_client.create_bucket().bucket(&config.bucket_name).send().await?;
+    }
+    
+    // Use default values for concurrent requests and chunk size if not provided.
     // This allows the user to override these values in the configuration file or environment variables.
     let stream_concurrent_requests = config.concurrent_requests.unwrap_or(CONCURRENT_REQUESTS);
 
+    // Create a download list from the regions defined in the configuration.
     let region_download_list =
         download::create_download_list(&config.regions, &config.download_base_url);
 
     let http_client = Arc::new(reqwest::Client::new());
 
+    // Iterate over the download list and perform concurrent downloads.
+    // This will download each file in the list concurrently, using the specified number of concurrent requests
+    // and chunk size. Each file will be uploaded to the S3 bucket in parts.
     stream::iter(region_download_list)
         .try_for_each_concurrent(stream_concurrent_requests, |(object, url)| {
             let http_client = http_client.clone();
             let storage_client = storage_client.clone();
             let value = config.clone();
+
             async move {
                 let response = http_client.get(url.clone()).send().await?;
-                let content_length = response.content_length();
-
-                info!("Content length for {}: {:?}", object, content_length);
-
-                // If the file is too large, we need to buffer it.
-                // Assuming stream_multipart is async and returns a Result.
+                let _content_length = response.content_length();
+                
                 let multipart_upload = storage_client
                     .create_multipart_upload()
                     .bucket(&value.bucket_name)
@@ -106,7 +106,6 @@ async fn main() -> Result<()> {
                     .await?;
 
                 let upload_id = multipart_upload.upload_id().unwrap_or_default();
-
                 let mut buffer = BytesMut::with_capacity(CHUNK_SIZE);
                 let mut parts_count = 1i32;
                 let mut completed_parts = Vec::new();
@@ -115,15 +114,9 @@ async fn main() -> Result<()> {
                 while let Some(bytes) = stream.next().await {
                     let bytes = bytes?;
                     buffer.extend_from_slice(&bytes);
+
                     if buffer.len() >= CHUNK_SIZE {
                         let part_bytes = buffer.split_to(CHUNK_SIZE).freeze();
-
-                        println!(
-                            "Uploading part {} for object {} with size {} bytes",
-                            parts_count,
-                            object,
-                            part_bytes.len()
-                        );
 
                         let upload_part_resp = storage_client
                             .upload_part()
@@ -141,9 +134,31 @@ async fn main() -> Result<()> {
                                 .set_e_tag(upload_part_resp.e_tag().map(|s| s.to_string()))
                                 .build(),
                         );
-
                         parts_count += 1;
                     }
+                }
+
+                // If there are remaining bytes in the buffer, upload them as the last part.
+                // This ensures that any remaining data is uploaded, even if it's less than PART_SIZE.
+                if !buffer.is_empty() {
+                    let final_part = buffer.freeze();
+
+                    let upload_part_resp = storage_client
+                        .upload_part()
+                        .bucket(&value.bucket_name)
+                        .key(object)
+                        .part_number(parts_count)
+                        .body(ByteStream::from(final_part))
+                        .upload_id(upload_id)
+                        .send()
+                        .await?;
+
+                    completed_parts.push(
+                        CompletedPart::builder()
+                            .set_part_number(Some(parts_count))
+                            .set_e_tag(upload_part_resp.e_tag().map(|s| s.to_string()))
+                            .build(),
+                    );
                 }
 
                 let completed_upload = CompletedMultipartUpload::builder()
@@ -160,6 +175,7 @@ async fn main() -> Result<()> {
                     .await?;
 
                 println!("Multipart upload created for object: {}", object);
+
                 Ok(())
             }
         })

@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-use aws_sdk_s3::operation::create_multipart_upload::{CreateMultipartUpload, CreateMultipartUploadError};
-use thiserror::Error;
 use url::{Url};
 
 use crate::{errors::Error, region::Region};
 
+/// Collects URLs from the given regions and constructs full URLs based on the base path.
+/// This function recursively traverses the regions, appending paths to the base URL
+/// and collecting leaf URLs.
 fn collect_urls<'a>(
     regions: &'a Vec<Region>,
     base_path: &Url,
@@ -21,7 +21,7 @@ fn collect_urls<'a>(
                 Err(e) => out_list.push(Err(Error::ParseUrlError(e))),
             },
             Region::Leaf { name: _, file } => {
-                let file_url = match base_path.join(file) {
+                match base_path.join(file) {
                     Ok(url) => out_list.push(Ok((file, url))),
                     Err(e) => out_list.push(Err(Error::ParseUrlError(e))),
                 };
@@ -30,10 +30,6 @@ fn collect_urls<'a>(
     }
 }
 
-// Collects URLs from the region structure, recursively traversing nodes and leaves.
-// For nodes, it appends the path to the base URL and collects URLs from child regions.
-// For leaves, it appends the file name to the base URL.
-// Returns a vector of URLs as strings.
 pub fn create_download_list<'a>(
     regions: &'a Vec<Region>,
     base_path: &Url,
