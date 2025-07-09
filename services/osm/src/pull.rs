@@ -1,12 +1,19 @@
 #![allow(warnings)]   
 
+use config;
 use anyhow::{Result, Context};
-use futures_util::{stream, StreamExt};
+use futures_util::{stream, StreamExt, TryStreamExt};
 use log::error;
 use minio::s3::{http::BaseUrl, segmented_bytes::SegmentedBytes, types::S3Api};
 
 mod download;
 mod storage;
+mod region;
+mod settings;
+
+use settings::Settings;
+
+use crate::storage::StorageBackend;
 
 // Default values for concurrent requests and chunk size
 // These values can be overridden by the configuration file or environment variables.
@@ -26,14 +33,14 @@ async fn main() -> Result<()> {
     // Deserialize the configuration into the Settings struct
     // This will fail if the structure does not match the expected format
     // or if required fields are missing.
-    let config = config.try_deserialize::<Config>()?;
+    let config = config.try_deserialize::<settings::Settings>()?;
 
     let storage_base_url = config.storage_base_url.to_string();
     let (storage_client, bucket_name) = storage::init(
         &storage_base_url,
-        &config.storage_bucket_name,
         &config.storage_username,
         &config.storage_password,
+        &config.storage_bucket_name,
     ).await?;
 
     // Use default values for concurrent requests and chunk size if not provided
@@ -43,37 +50,34 @@ async fn main() -> Result<()> {
     
     let http_client = reqwest::Client::new();
     
-    let region_download_list = download::create_download_list(&config.regions, &config.download_base_url)?;
+    let region_download_list = download::create_download_list(&config.regions, &config.download_base_url);
     
-    stream::iter(region_download_list).for_each_concurrent(stream_concurrent_requests, |(object, url)| {
+    stream::iter(region_download_list).try_for_each_concurrent(stream_concurrent_requests, |(object, url)| {
         let http_client = http_client.clone();
         let storage_client = storage_client.clone();
+        let bucket_name = bucket_name.clone();
+
+        println!("Downloading object: {} for url {}", object, url);
+
         async move {
-            let response = match http_client.get(url.clone()).send().await {
-                Ok(resp) => resp,
-                Err(err) => {
-                    error!("Failed to download {}: {}", url, err);
-                    return;
-                }
-            };
-            let content_length = match response.content_length() {
-                Some(length) => length,
-                None => {
-                    error!("Failed to get content length for {}: {}", url, response.status());
-                    return;
-                }
-            };
+            let response = http_client.get(url.clone()).send().await?;
+            let content_length = response.content_length();
+
+            println!("Content length for {}: {:?}", object, content_length);
             
             // If the file is too large, we need to buffer it.
+            // Assuming stream_multipart is async and returns a Result.
             storage_client.stream_multipart(
                 &bucket_name,
                 object,
                 response.bytes_stream(),
                 content_length,
                 stream_chunk_size,
-            );
+            ).await;
+
+            Ok(())
         }
-    }).await;
+    }).await?;
 
     Ok(())
 }

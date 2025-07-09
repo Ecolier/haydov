@@ -24,7 +24,7 @@ pub trait StorageBackend: Send + Sync {
         bucket: &str,
         object: &str,
         mut stream: S,
-        total_size: u64,
+        total_size: Option<u64>,
         chunk_size: usize,
     ) -> Result<CompleteMultipartUpload, minio::s3::error::Error>
     where
@@ -38,7 +38,7 @@ impl StorageBackend for minio::s3::Client {
         bucket: &str,
         object: &str,
         mut stream: S,
-        total_size: u64,
+        total_size: Option<u64>,
         chunk_size: usize,
     ) -> Result<CompleteMultipartUpload, minio::s3::error::Error>
     where
@@ -46,8 +46,9 @@ impl StorageBackend for minio::s3::Client {
     {
         let mut buffer = BytesMut::with_capacity(chunk_size);
         let mut parts_count = 1u16;
-        let parts_len = (total_size / chunk_size as u64 + 1) as usize;
-        let mut parts: Vec<PartInfo> = Vec::with_capacity(parts_len);
+
+        let parts_len = total_size.map(|size: u64| (size / chunk_size as u64 + 1) as usize);;
+        let mut parts: Vec<PartInfo> = Vec::with_capacity(parts_len.unwrap_or(chunk_size));
 
         let CreateMultipartUploadResponse { upload_id, .. } =
             self.create_multipart_upload(bucket, object).send().await?;
@@ -108,9 +109,9 @@ impl StorageBackend for minio::s3::Client {
 }
 
 pub async fn init<'a>(
+    base_url: &'a str,
     access_key: &'a str,
     secret_key: &'a str,
-    base_url: &'a str,
     bucket_name: &'a str,
 ) -> Result<(minio::s3::Client, &'a str), StorageError> {
     let static_provider = minio::s3::creds::StaticProvider::new(access_key, secret_key, None);

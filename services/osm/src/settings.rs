@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-use crate::osm::Region;
+use crate::region::Region;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
+pub struct Settings {
     pub regions: Vec<Region>,
     pub storage_base_url: Url,
     pub storage_bucket_name: String,
