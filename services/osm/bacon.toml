@@ -19,4 +19,6 @@ kill = ["kill", "-s", "INT"]
 [jobs.pull]
 command = ["cargo", "run", "--bin", "pull"]
 need_stdout = true
-background = true
+background = false
+on_change_strategy = "kill_then_restart"
+kill = ["kill", "-s", "INT"]

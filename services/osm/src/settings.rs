@@ -6,11 +6,12 @@ use crate::region::Region;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Settings {
     pub regions: Vec<Region>,
-    pub storage_base_url: Url,
-    pub storage_bucket_name: String,
-    pub storage_username: String,
-    pub storage_password: String,
     pub download_base_url: Url,
-    pub stream_concurrent_requests: Option<usize>,
-    pub stream_chunk_size: Option<usize>,
+    pub concurrent_requests: Option<usize>,
+    pub bucket_name: String,
+    pub aws_access_key_id: String,
+    pub aws_secret_access_key: String,
+    pub aws_region: String,
+    pub aws_default_region: String,
+    pub aws_s3_endpoint: String,
 }

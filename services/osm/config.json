@@ -8,17 +8,27 @@
           "name": "Montenegro",
           "file": "montenegro-latest.osm.pbf",
           "checksum": "montenegro-latest.osm.pbf.md5"
-        }
-      ]
-    },
-    {
-      "name": "Asia",
-      "path": "asia/",
-      "regions": [
+        },
         {
-          "name": "Japan",
-          "file": "japan-latest.osm.pbf",
-          "checksum": "japan-latest.osm.pbf.md5"
+          "name": "France",
+          "path": "france/",
+          "regions": [
+            {
+              "name": "Guyane",
+              "file": "guyane-latest.osm.pbf",
+              "checksum": "guyane.osm.pbf.md5"
+            }
+          ]
+        },
+        {
+          "name": "Macedonia",
+          "file": "macedonia-latest.osm.pbf",
+          "checksum": "macedonia-latest.osm.pbf.md5"
+        },
+        {
+          "name": "Malta",
+          "file": "malta-latest.osm.pbf",
+          "checksum": "malta-latest.osm.pbf.md5"
         }
       ]
     }

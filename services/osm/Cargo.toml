@@ -14,6 +14,8 @@ path = "src/server.rs"
 [dependencies]
 anyhow = "1.0.98"
 async-trait = "0.1.88"
+aws-config = { version = "1.8.1", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1.96.0"
 axum = "0.8.4"
 bytes = "1.10.1"
 config = "0.15.11"
@@ -21,7 +23,6 @@ futures-util = "0.3.31"
 libloading = "0.8.8"
 log = "0.4.27"
 md5 = "0.8.0"
-minio = "0.3.0"
 reqwest = {version = "0.12.22", features = ["stream"] }
 serde = "1.0.219"
 thiserror = "2.0.12"
