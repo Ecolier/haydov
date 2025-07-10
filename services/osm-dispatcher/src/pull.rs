@@ -55,25 +55,6 @@ async fn main() -> Result<()> {
         .build();
 
     let storage_client = Arc::new(aws_sdk_s3::Client::from_conf(s3_config));
-
-    // Check if the bucket exists, if not, create it
-    let exists = match storage_client.head_bucket()
-        .bucket(&config.bucket_name)
-        .send()
-        .await
-    {
-        Ok(_) => true,
-        Err(err) => {
-            match err.as_service_error().map(|e| e.is_not_found()) {
-                Some(true) => false,
-                _ => return Err(anyhow::Error::from(err)),
-            }
-        }
-    };
-
-    if !exists {
-        storage_client.create_bucket().bucket(&config.bucket_name).send().await?;
-    }
     
     // Use default values for concurrent requests and chunk size if not provided.
     // This allows the user to override these values in the configuration file or environment variables.

@@ -1,5 +1,5 @@
 [package]
-name = "geography"
+name = "osm-dispatcher"
 version = "0.1.0"
 edition = "2024"
 

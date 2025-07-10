@@ -1,7 +1,8 @@
 include:
-  - services/maps/compose.override.yml
+  - services/osm-dispatcher/compose.override.yml
+  - services/osm-storage/compose.override.yml
 
 services:
-  traefik:
+  api-gateway:
     ports:
       - "8080:8080"

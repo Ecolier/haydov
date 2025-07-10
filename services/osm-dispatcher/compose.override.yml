@@ -1,5 +1,5 @@
 services:
-  geography:
+  osm-dispatcher:
     build:
       context: ./
       target: development
@@ -13,6 +13,3 @@ services:
           target: /app
     ports:
       - 3000:3000
-  io:
-    labels:
-      - "traefik.http.routers.haydov.rule=Host(`geography.haydov.localhost`)"
