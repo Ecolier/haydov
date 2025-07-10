@@ -1,7 +1,6 @@
 include:
-  - services/maps-geocoder/compose.override.yml
-  - services/osm-dispatcher/compose.override.yml
-  - services/osm-storage/compose.override.yml
+  - services/geocoding/compose.override.yml
+  - services/osm/compose.override.yml
 
 services:
   api-gateway:

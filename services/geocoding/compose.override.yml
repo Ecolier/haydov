@@ -1,12 +1,12 @@
 services:
-  maps-importer:
+  geocoding-importer:
     build: 
-      context: .
+      context: ./importer
       dockerfile: Dockerfile
       additional_contexts:
         workspace_root: ../..
     develop:
       watch:
         - action: sync
-          path: ./
-          target: /app/services/maps-geocoder
+          path: ./importer
+          target: /app/services/geocoding/importer

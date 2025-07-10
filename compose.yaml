@@ -1,7 +1,6 @@
 include:
-  - services/maps-geocoder/compose.yml
-  - services/osm-dispatcher/compose.yml
-  - services/osm-storage/compose.yml
+  - services/geocoding/compose.yml
+  - services/osm/compose.yml
 
 services:
   api-gateway:

@@ -1,4 +1,4 @@
 packages:
   - apps/mobile
-  - services/maps-geocoder
+  - services/geocoding/importer
 nodeLinker: hoisted

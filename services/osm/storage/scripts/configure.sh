@@ -16,10 +16,12 @@ mc alias set local http://localhost:$MINIO_API_PORT "$MINIO_ROOT_USER" "$MINIO_R
 # Create bucket if not exists
 mc ls local/$OSM_BUCKET_NAME || mc mb local/$OSM_BUCKET_NAME
 
-# Set up webhook notification
-mc admin config set local notify_webhook:osmhook \
-  endpoint="https://example.com/osm-update" \
-  queue_limit="0"
+# Loop over each webhook entry
+jq -r '.webhooks[].endpoint' ./config.json | while read -r endpoint; do
+  mc admin config set local notify_webhook:osmhook \
+    endpoint="$endpoint" \
+    queue_limit="0"
+done
 
 # Save and apply the config
 mc admin service restart local --json

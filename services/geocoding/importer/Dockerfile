@@ -12,22 +12,22 @@ COPY --from=workspace_root package.json ./
 COPY --from=workspace_root pnpm-workspace.yaml ./
 COPY --from=workspace_root nx.json ./
 
-COPY ./package.json ./services/maps-geocoder/
+COPY ./package.json ./services/geocoding/importer/
 
 RUN pnpm install --frozen-lockfile
 
 # Copy the Pelias codebase
 COPY --from=pelias /code /code
 
-# Copy the maps-geocoder service code
-COPY . ./services/maps-geocoder/
+# Copy the geocoding-importer service code
+COPY . ./services/geocoding/importer/
 
 # Build the application
-RUN pnpm nx build maps-importer
+RUN pnpm nx build geocoding-importer
 
-EXPOSE 3000
+EXPOSE 4000
 ENTRYPOINT [ "pnpm" ]
-CMD [ "nx", "dev", "maps-importer" ]
+CMD [ "nx", "dev", "geocoding-importer" ]
 
 # FROM node:current AS builder
 
