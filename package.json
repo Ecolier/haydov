@@ -5,15 +5,8 @@
   "author": "Evan Gruère",
   "license": "ISC",
   "devDependencies": {
-    "@expo/cli": "~0.24.20",
     "@nx/expo": "21.2.2",
     "@nx/react": "21.2.2",
     "nx": "21.2.2"
-  },
-  "dependencies": {
-    "expo": "~53.0.19",
-    "react": "~19.1.0",
-    "react-dom": "~19.1.0",
-    "react-native": "0.80.1"
   }
 }

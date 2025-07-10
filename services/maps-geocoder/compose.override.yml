@@ -1,0 +1,12 @@
+services:
+  maps-importer:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      additional_contexts:
+        workspace_root: ../..
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app/services/maps-geocoder

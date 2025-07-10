@@ -5,20 +5,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "fastify": "^5.4.0",
     "typescript": "~5.8.3"
   },
+  "devDependencies": {
+    "tsx": "^4.20.3",
+    "@types/node": "^24.0.12"
+  },
   "nx": {
     "targets": {
       "build": {
-        "dependsOn": ["^build"]
+        "dependsOn": [
+          "^build"
+        ]
       }
     }
   }
