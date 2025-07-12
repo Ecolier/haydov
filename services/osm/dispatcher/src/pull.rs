@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::{SystemTime, UNIX_EPOCH}};
 
 use anyhow::Result;
 use aws_config::Region;
@@ -10,6 +10,8 @@ use aws_sdk_s3::{
 use bytes::BytesMut;
 use config;
 use futures_util::{StreamExt, TryStreamExt, stream};
+
+use chrono::{DateTime, Utc};
 
 mod download;
 mod errors;
@@ -66,6 +68,15 @@ async fn main() -> Result<()> {
 
     let http_client = Arc::new(reqwest::Client::new());
 
+    // Generate a timestamp and date prefix for the S3 bucket.
+    // This will be used to create a unique identifier for the batch of downloads.
+    let now = SystemTime::now();
+    let duration = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
+    let timestamp_millis = duration.as_millis();
+    let datetime: DateTime<Utc> = now.into();
+    let date_prefix = datetime.format("%Y/%m/%d").to_string();
+    let batch_id = timestamp_millis.to_string();
+
     // Iterate over the download list and perform concurrent downloads.
     // This will download each file in the list concurrently, using the specified number of concurrent requests
     // and chunk size. Each file will be uploaded to the S3 bucket in parts.
@@ -75,6 +86,8 @@ async fn main() -> Result<()> {
             let storage_client = storage_client.clone();
             let value = config.clone();
 
+            let object = format!("batches/{}/{}-{}", date_prefix, batch_id, &object);
+
             async move {
                 let response = http_client.get(url.clone()).send().await?;
                 let _content_length = response.content_length();
@@ -82,7 +95,7 @@ async fn main() -> Result<()> {
                 let multipart_upload = storage_client
                     .create_multipart_upload()
                     .bucket(&value.bucket_name)
-                    .key(object)
+                    .key(&object)
                     .send()
                     .await?;
 
@@ -102,7 +115,7 @@ async fn main() -> Result<()> {
                         let upload_part_resp = storage_client
                             .upload_part()
                             .bucket(&value.bucket_name)
-                            .key(object)
+                            .key(&object)
                             .part_number(parts_count)
                             .body(ByteStream::from(part_bytes))
                             .upload_id(upload_id)
@@ -127,7 +140,7 @@ async fn main() -> Result<()> {
                     let upload_part_resp = storage_client
                         .upload_part()
                         .bucket(&value.bucket_name)
-                        .key(object)
+                        .key(&object)
                         .part_number(parts_count)
                         .body(ByteStream::from(final_part))
                         .upload_id(upload_id)
@@ -149,13 +162,13 @@ async fn main() -> Result<()> {
                 storage_client
                     .complete_multipart_upload()
                     .bucket(&value.bucket_name)
-                    .key(object)
+                    .key(&object)
                     .multipart_upload(completed_upload)
                     .upload_id(upload_id)
                     .send()
                     .await?;
 
-                println!("Multipart upload created for object: {}", object);
+                println!("Multipart upload created for object: {}", &object);
 
                 Ok(())
             }
