@@ -6,6 +6,9 @@ services:
     volumes:
       - "./pelias.json:/code/pelias.json"
       - "${DATA_DIR}:/data"
+    depends_on:
+      message:
+        condition: service_healthy
 
   # maps-geocoder:
   #   image: pelias/api:master

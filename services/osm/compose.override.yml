@@ -30,6 +30,7 @@ services:
       - MINIO_NOTIFY_AMQP_ENABLE_PRIMARY=${MINIO_NOTIFY_AMQP_ENABLE_PRIMARY:-on}
       - MINIO_NOTIFY_AMQP_URL_PRIMARY=${MINIO_NOTIFY_AMQP_URL_PRIMARY:-amqp://haydov_test_user:haydov_test_password@message:5672/}
       - MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY=${MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY:-fanout}
+      - MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY=${MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY:-haydov.osm}
     labels:
       - "traefik.http.routers.haydov.rule=Host(`geography.haydov.localhost`)"
     volumes:

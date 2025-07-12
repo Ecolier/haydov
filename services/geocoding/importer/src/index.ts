@@ -31,7 +31,20 @@ const client = new S3Client({
 });
 
 connect(env.MESSAGE_BROKER_URL).then((connection) => {
-  console.log("Connected to message broker", connection);
+  console.log("Connected to message broker");
+  connection.createChannel().then((channel) => {
+    channel.assertExchange("haydov.osm", "fanout", { durable: false });
+    channel.assertQueue("dispatch", { durable: true });
+    channel.bindQueue("dispatch", "haydov.osm", "");
+    channel.consume("dispatch", (msg) => {
+      if (msg !== null) {
+        const event = JSON.parse(msg.content.toString());
+        console.log("Received message:", event);
+        // Process the message as needed
+        channel.ack(msg);
+      }
+    });
+  });
 }).catch((error) => {
   console.error("Error connecting to message broker:", error);
 });
