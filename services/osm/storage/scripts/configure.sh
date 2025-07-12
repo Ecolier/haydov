@@ -18,5 +18,5 @@ mc ls local/$OSM_BUCKET_NAME || mc mb local/$OSM_BUCKET_NAME
 
 # Loop over each webhook entry
 mc admin info --json local | jq -r .info.sqsARN[] | while read -r arn; do 
-  [ -n "$(mc event ls local/$OSM_BUCKET_NAME "$arn")" ] || mc event add local/$OSM_BUCKET_NAME "$arn"
+  [ -n "$(mc event ls local/$OSM_BUCKET_NAME "$arn")" ] || mc event add local/$OSM_BUCKET_NAME "$arn" --event put
 done

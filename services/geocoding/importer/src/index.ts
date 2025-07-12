@@ -1,11 +1,14 @@
-import fastify from "fastify";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { configDotenv } from "dotenv";
 import { cleanEnv, str } from "envalid";
 import { S3Event } from "aws-lambda";
 import { connect } from "amqplib";
 
-import {createWriteStream} from "fs";
+import path from "path";
+
+import { mkdir } from "fs/promises";
+import { createWriteStream } from "fs";
+import { pipeline } from "stream/promises";
 
 configDotenv();
 
@@ -17,7 +20,9 @@ const env = cleanEnv(process.env, {
   AWS_REGION: str({ default: "us-west-2" }),
   AWS_DEFAULT_REGION: str({ default: "us-west-2" }),
   OSM_BUCKET_NAME: str({ default: "osm-dumps" }),
-  MESSAGE_BROKER_URL: str({ default: "amqp://haydov_test_user:haydov_test_password@message:5672/" }),
+  MESSAGE_BROKER_URL: str({
+    default: "amqp://haydov_test_user:haydov_test_password@message:5672/",
+  }),
 });
 
 const client = new S3Client({
@@ -27,65 +32,70 @@ const client = new S3Client({
   credentials: {
     accessKeyId: env.AWS_ACCESS_KEY_ID,
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-  }
+  },
 });
 
-connect(env.MESSAGE_BROKER_URL).then((connection) => {
-  console.log("Connected to message broker");
-  connection.createChannel().then((channel) => {
-    channel.assertExchange("haydov.osm", "fanout", { durable: false });
-    channel.assertQueue("dispatch", { durable: true });
-    channel.bindQueue("dispatch", "haydov.osm", "");
-    channel.consume("dispatch", (msg) => {
-      if (msg !== null) {
-        const event = JSON.parse(msg.content.toString());
-        console.log("Received message:", event);
-        // Process the message as needed
+const exchange = "haydov.osm";
+const queue = "dispatch";
+
+(async () => {
+  try {
+    const connection = await connect(env.MESSAGE_BROKER_URL);
+    process.once("SIGINT", async () => {
+      await connection.close();
+    });
+
+    const channel = await connection.createChannel();
+    await channel.assertExchange(exchange, "fanout", { durable: false });
+    await channel.assertQueue(queue, { durable: true });
+    await channel.bindQueue(queue, exchange, "");
+    await channel.prefetch(1);
+
+    await channel.consume(queue, async (msg) => {
+      if (msg === null) return;
+
+      try {
+        const content = JSON.parse(msg.content.toString()) as S3Event;
+
+        const bucketName = content.Records[0].s3.bucket.name;
+        const objectKey = decodeURIComponent(content.Records[0].s3.object.key);
+
+        const output = await client.send(
+          new GetObjectCommand({
+            Bucket: bucketName,
+            Key: objectKey,
+          })
+        );
+
+        if (output.ContentLength === 0) {
+          console.warn(`⚠️ Skipping 0-byte sentinel file: ${objectKey}`);
+          channel.ack(msg);
+          return;
+        }
+
+        await mkdir(path.join("/data", path.dirname(objectKey)), {
+          recursive: true,
+        });
+
+        await pipeline(
+          output.Body as NodeJS.ReadableStream,
+          createWriteStream(path.join("/data", objectKey))
+        );
+
+        console.log(
+          `📂 Download object: ${objectKey} from bucket: ${bucketName}`
+        );
+
         channel.ack(msg);
+      } catch (err) {
+        console.error(`Error processing message:`, err);
+        channel.nack(msg, false, false); // reject message without requeueing
       }
     });
-  });
-}).catch((error) => {
-  console.error("Error connecting to message broker:", error);
-});
 
-const app = fastify();
-app.post("/update-osm", async (request, reply) => {
-  const req = request.body as unknown as S3Event;
-
-  if (!req || !req.Records || req.Records.length === 0) {
-    return reply.status(400).send({ error: "Invalid S3 event data." });
-  }
-
-  const record = req.Records[0];
-  const bucketName = record.s3.bucket.name;
-  const objectKey = record.s3.object.key;
-
-  const response = await client.send(new GetObjectCommand({
-    Bucket: bucketName,
-    Key: objectKey,
-  }));
-
-  const stream = response.Body as NodeJS.ReadableStream;
-  const writable = createWriteStream(`/data/${objectKey}`);
-  stream.pipe(writable);
-  
-  writable.on("finish", () => {
-    console.log(`File ${objectKey} downloaded successfully.`);
-    reply.send({ message: `File ${objectKey} downloaded successfully.` });
-  });
-
-  writable.on("error", (err) => {
-    console.error(`Error writing file ${objectKey}:`, err);
-    reply.status(500).send({ error: "Failed to write file." });
-  });
-
-});
-
-app.listen({ host: "0.0.0.0", port: 4000 }, (err, address) => {
-  if (err) {
-    console.error(err);
+    console.log(`✅ Waiting for messages in ${queue}. To exit press CTRL+C`);
+  } catch (err) {
+    console.error("❌ Error connecting to RabbitMQ:", err);
     process.exit(1);
   }
-  console.log(`Server listening on ${address}`);
-});
+})();

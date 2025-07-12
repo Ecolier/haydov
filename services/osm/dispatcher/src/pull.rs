@@ -175,5 +175,14 @@ async fn main() -> Result<()> {
         })
         .await?;
 
+    // After all downloads are complete, mark the batch as ready by creating a READY file in the S3 bucket.
+    // This file will be used to indicate that the batch of downloads is complete and ready for processing.
+    storage_client
+        .put_object()
+        .bucket(&config.bucket_name)
+        .key(format!("batches/{}/{}_READY", date_prefix, batch_id))
+        .send()
+        .await?;
+
     Ok(())
 }
