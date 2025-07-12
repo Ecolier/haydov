@@ -39,13 +39,10 @@
       "countryCode": "FR"
     },
     "openstreetmap": {
-      "download": [
-        { "sourceURL": "http://download.geofabrik.de/europe/france-latest.osm.pbf" }
-      ],
       "leveldbpath": "/tmp",
       "datapath": "/data/openstreetmap",
       "import": [{
-        "filename": "france-latest.osm.pbf"
+        "filename": "macedonia-latest.osm.pbf"
       }]
     },
     "openaddresses": {

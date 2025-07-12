@@ -2,6 +2,7 @@ services:
   geocoding-importer:
     ports:
       - 4000:4000
+    env_file: .env
     volumes:
       - "./pelias.json:/code/pelias.json"
       - "${DATA_DIR}:/data"

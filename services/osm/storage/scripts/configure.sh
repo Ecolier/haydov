@@ -17,16 +17,6 @@ mc alias set local http://localhost:$MINIO_API_PORT "$MINIO_ROOT_USER" "$MINIO_R
 mc ls local/$OSM_BUCKET_NAME || mc mb local/$OSM_BUCKET_NAME
 
 # Loop over each webhook entry
-jq -r '.webhooks[].endpoint' ./config.json | while read -r endpoint; do
-  mc admin config set local notify_webhook:osmhook \
-    endpoint="$endpoint" \
-    queue_limit="0"
+mc admin info --json local | jq .info.sqsARN[] | while read -r arn; do 
+  mc event ls local/$OSM_BUCKET_NAME "$arn" || mc event add local/$OSM_BUCKET_NAME "$arn"
 done
-
-# Save and apply the config
-mc admin service restart local --json
-
-wait_until_ready
-
-# Enable webhook for bucket
-mc event add local/$OSM_BUCKET_NAME arn:minio:sqs::osmhook:webhook --event put

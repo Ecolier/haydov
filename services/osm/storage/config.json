@@ -1,7 +1,0 @@
-{
-  "webhooks": [
-    {
-      "endpoint": "http://geocoding-importer:4000/update-osm"
-    }
-  ]
-}

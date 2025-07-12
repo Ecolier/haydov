@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
 members = [
-  "services/maps-api", 
-  "services/osm-dispatcher"
+  "services/maps", 
+  "services/osm/dispatcher"
 ]

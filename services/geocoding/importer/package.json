@@ -13,10 +13,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.844.0",
+    "amqplib": "^0.10.8",
+    "dotenv": "^17.2.0",
+    "envalid": "^8.0.0",
     "fastify": "^5.4.0",
     "typescript": "~5.8.3"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/aws-lambda": "^8.10.150",
     "@types/node": "^24.0.12",
     "nodemon": "^3.1.10",
     "tsx": "^4.20.3"
