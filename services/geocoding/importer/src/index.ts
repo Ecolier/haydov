@@ -6,20 +6,21 @@ import { connect } from "amqplib";
 
 import path from "path";
 
-import { mkdir } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
+import { exec, spawn } from "child_process";
 
 configDotenv();
 
 // Validate environment variables
 const env = cleanEnv(process.env, {
-  AWS_S3_ENDPOINT: str({ default: "http://osm-storage:9000/" }),
+  AWS_S3_ENDPOINT: str({ default: "http://geography-storage:9000/" }),
   AWS_ACCESS_KEY_ID: str({ default: "haydov_access" }),
   AWS_SECRET_ACCESS_KEY: str({ default: "haydov_secret" }),
   AWS_REGION: str({ default: "us-west-2" }),
   AWS_DEFAULT_REGION: str({ default: "us-west-2" }),
-  OSM_BUCKET_NAME: str({ default: "osm-dumps" }),
+  GEOGRAPHY_BUCKET_NAME: str({ default: "geography" }),
   MESSAGE_BROKER_URL: str({
     default: "amqp://haydov_test_user:haydov_test_password@message:5672/",
   }),
@@ -35,7 +36,7 @@ const client = new S3Client({
   },
 });
 
-const exchange = "haydov.osm";
+const exchange = "haydov.geography";
 const queue = "dispatch";
 
 (async () => {
@@ -50,6 +51,8 @@ const queue = "dispatch";
     await channel.assertQueue(queue, { durable: true });
     await channel.bindQueue(queue, exchange, "");
     await channel.prefetch(1);
+
+    const importFiles: string[] = [];
 
     await channel.consume(queue, async (msg) => {
       if (msg === null) return;
@@ -69,18 +72,20 @@ const queue = "dispatch";
 
         if (output.ContentLength === 0) {
           console.warn(`⚠️ Skipping 0-byte sentinel file: ${objectKey}`);
-          channel.ack(msg);
-          return;
+          const config = JSON.parse((await readFile("/code/pelias.json")).toLocaleString());
+          config.imports.openstreetmap.import = importFiles.map((file) => ({filename: file}));
+          await writeFile("/code/pelias.json", JSON.stringify(config, null, 2));
+          spawn(`cd /code/pelias/openstreetmap && HOME=/code ./bin/start`, { stdio: "inherit", shell: true });
         }
 
-        await mkdir(path.join("/data", path.dirname(objectKey)), {
-          recursive: true,
-        });
+        const objectBasename = path.basename(objectKey);
 
         await pipeline(
           output.Body as NodeJS.ReadableStream,
-          createWriteStream(path.join("/data", objectKey))
+          createWriteStream(path.join("/data", objectBasename))
         );
+
+        importFiles.push(objectBasename);
 
         console.log(
           `📂 Download object: ${objectKey} from bucket: ${bucketName}`

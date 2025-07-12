@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
     let config = config::Config::builder()
         .add_source(config::File::with_name("config.json"))
         .add_source(config::Environment::default())
-        .add_source(config::Environment::with_prefix("OSM"))
+        .add_source(config::Environment::with_prefix("GEOGRAPHY"))
         .build()?;
 
     // Deserialize the configuration into the Settings struct

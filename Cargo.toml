@@ -2,5 +2,5 @@
 resolver = "3"
 members = [
   "services/maps", 
-  "services/osm/dispatcher"
+  "services/geography/dispatcher"
 ]

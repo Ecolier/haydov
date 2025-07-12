@@ -1150,6 +1150,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "geography-dispatcher"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "aws-config",
+ "aws-sdk-s3",
+ "axum",
+ "bytes",
+ "chrono",
+ "config",
+ "futures-util",
+ "libloading",
+ "log",
+ "md5",
+ "reqwest",
+ "serde",
+ "thiserror",
+ "tokio",
+ "tower",
+ "url",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1932,30 +1956,6 @@ checksum = "49203cdcae0030493bad186b28da2fa25645fa276a51b6fec8010d281e02ef79"
 dependencies = [
  "dlv-list",
  "hashbrown 0.14.5",
-]
-
-[[package]]
-name = "osm-dispatcher"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "aws-config",
- "aws-sdk-s3",
- "axum",
- "bytes",
- "chrono",
- "config",
- "futures-util",
- "libloading",
- "log",
- "md5",
- "reqwest",
- "serde",
- "thiserror",
- "tokio",
- "tower",
- "url",
 ]
 
 [[package]]

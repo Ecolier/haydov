@@ -6,7 +6,9 @@
   "esclient": {
     "apiVersion": "7.5",
     "hosts": [
-      { "host": "elasticsearch" }
+      {
+        "host": "elasticsearch"
+      }
     ]
   },
   "elasticsearch": {
@@ -20,10 +22,18 @@
   },
   "api": {
     "services": {
-      "pip": { "url": "http://pip:4200" },
-      "libpostal": { "url": "http://libpostal:4400" },
-      "placeholder": { "url": "http://placeholder:4100" },
-      "interpolation": { "url": "http://interpolation:4300" }
+      "pip": {
+        "url": "http://pip:4200"
+      },
+      "libpostal": {
+        "url": "http://libpostal:4400"
+      },
+      "placeholder": {
+        "url": "http://placeholder:4100"
+      },
+      "interpolation": {
+        "url": "http://interpolation:4300"
+      }
     },
     "defaultParameters": {
       "focus.point.lat": 46.61,
@@ -40,24 +50,42 @@
     },
     "openstreetmap": {
       "leveldbpath": "/tmp",
-      "datapath": "/data/openstreetmap",
-      "import": [{
-        "filename": "macedonia-latest.osm.pbf"
-      }]
+      "datapath": "/data",
+      "import": [
+        {
+          "filename": "1752330495876-malta-latest.osm.pbf"
+        },
+        {
+          "filename": "1752330495876-guyane-latest.osm.pbf"
+        },
+        {
+          "filename": "1752330495876-macedonia-latest.osm.pbf"
+        },
+        {
+          "filename": "1752330495876-montenegro-latest.osm.pbf"
+        }
+      ]
     },
     "openaddresses": {
       "datapath": "/data/openaddresses",
-      "files": ["fr/countrywide.csv"]
+      "files": [
+        "fr/countrywide.csv"
+      ]
     },
     "polyline": {
       "datapath": "/data/polylines",
-      "files": [ "extract.0sv" ]
+      "files": [
+        "extract.0sv"
+      ]
     },
     "whosonfirst": {
       "datapath": "/data/whosonfirst",
       "importPostalcodes": true,
       "countryCode": "FR",
-      "importPlace": [ "136253037", "85633147" ]
+      "importPlace": [
+        "136253037",
+        "85633147"
+      ]
     }
   }
 }

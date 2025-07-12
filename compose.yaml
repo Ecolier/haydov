@@ -1,7 +1,7 @@
 include:
   - services/message/compose.yml
   - services/geocoding/compose.yml
-  - services/osm/compose.yml
+  - services/geography/compose.yml
 
 services:
   api-gateway:

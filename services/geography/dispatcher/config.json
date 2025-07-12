@@ -7,11 +7,13 @@
       "regions": [
         {
           "name": "Montenegro",
+          "code": "ME",
           "file": "montenegro-latest.osm.pbf",
           "checksum": "montenegro-latest.osm.pbf.md5"
         },
         {
           "name": "France",
+          "code": "FR",
           "path": "france/",
           "regions": [
             {
@@ -23,11 +25,13 @@
         },
         {
           "name": "Macedonia",
+          "code": "MK",
           "file": "macedonia-latest.osm.pbf",
           "checksum": "macedonia-latest.osm.pbf.md5"
         },
         {
           "name": "Malta",
+          "code": "MT",
           "file": "malta-latest.osm.pbf",
           "checksum": "malta-latest.osm.pbf.md5"
         }

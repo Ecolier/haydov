@@ -1,4 +1,13 @@
 services:
+  geocoding-whosonfirst:
+    image: pelias/whosonfirst:master
+    volumes:
+      - "./pelias.json:/code/pelias.json"
+      - "${DATA_DIR}:/data"
+    depends_on:
+      message:
+        condition: service_healthy
+
   geocoding-importer:
     ports:
       - 4000:4000
@@ -37,13 +46,6 @@ services:
   #     - "./pelias.json:/code/pelias.json"
   #     - "${DATA_DIR}:/data"
   #     - "./blacklist/:/data/blacklist"
-
-  # maps-whosonfirst:
-  #   image: pelias/whosonfirst:master
-  #   user: "${DOCKER_USER}"
-  #   volumes:
-  #     - "./pelias.json:/code/pelias.json"
-  #     - "${DATA_DIR}:/data"
 
   # maps-elasticsearch:
   #   image: pelias/elasticsearch:7.17.27
