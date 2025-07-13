@@ -3,15 +3,9 @@ kind: Deployment
 metadata:
   name: geography-dispatcher
 spec:
-  selector:
-    matchLabels:
-      app: geography-dispatcher
   template:
-    metadata:
-      labels:
-        app: geography-dispatcher
     spec:
       containers:
       - name: geography-dispatcher
-        tty: true
-        stdin: true
+        # tty: true
+        # stdin: true

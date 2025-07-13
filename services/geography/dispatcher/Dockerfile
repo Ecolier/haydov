@@ -35,7 +35,7 @@ RUN cargo chef cook --recipe-path recipe.json
 COPY . .
 
 EXPOSE 3000
-CMD ["bacon"]
+CMD ["bacon", "--headless"]
 
 FROM debian:bookworm-slim AS production
 

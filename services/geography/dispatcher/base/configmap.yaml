@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geography-dispatcher-config
+data:
+  AWS_DEFAULT_REGION: us-west-2
+  AWS_REGION: us-west-2
+  AWS_S3_ENDPOINT: http://osm-storage:9000/
+  CONCURRENT_REQUESTS: "4"
+  OSM_DOWNLOAD_BASE_URL: https://download.geofabrik.de/
+  WOF_DOWNLOAD_BASE_URL: https://data.geocode.earth/wof/dist/

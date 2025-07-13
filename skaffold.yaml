@@ -9,12 +9,19 @@ build:
       docker:
         dockerfile: Dockerfile
         target: development
+      sync:
+        manual:
+          - src: 'services/geography/dispatcher/src/**'
+            dest: '/app/src'
 manifests:
   kustomize:
     paths:
+      - services/geography
+      - services/geography/dispatcher/base
       - services/geography/dispatcher/overlays/dev
   rawYaml:
-    - services/geography/dispatcher/deployment.yaml
-    - services/geography/dispatcher/service.yaml
+    - services/geography/dispatcher/base/deployment.yaml
+    - services/geography/dispatcher/base/service.yaml
     - services/message-broker/deployment.yaml
     - services/message-broker/service.yaml
+  

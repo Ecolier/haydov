@@ -17,12 +17,19 @@ spec:
           image: geography-dispatcher:latest
           tty: true
           stdin: true
+          envFrom:
+            - configMapRef:
+                name: geography-dispatcher-config
+            - configMapRef:
+                name: geography-config
+            - secretRef:
+                name: geography-credentials
           ports:
             - containerPort: 3000
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "250m"
+              memory: "1Gi"
+              cpu: "1"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "2Gi"
+              cpu: "2"

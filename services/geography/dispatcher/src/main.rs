@@ -30,7 +30,6 @@ async fn main() -> Result<()> {
     let config = config::Config::builder()
         .add_source(config::File::with_name("config.json"))
         .add_source(config::Environment::default())
-        .add_source(config::Environment::with_prefix("GEOGRAPHY"))
         .build()?;
 
     // Deserialize the configuration into the Settings struct
@@ -42,8 +41,8 @@ async fn main() -> Result<()> {
     // This will use the AWS SDK to create a new S3 bucket if it does not already exist.
     // If the bucket already exists, it will return an error.
     let credentials = Credentials::new(
-        &config.aws_access_key_id,
-        &config.aws_secret_access_key,
+        &config.storage_access_key_id,
+        &config.storage_secret_access_key,
         None,
         None,
         "loaded-from-custom-env",
@@ -64,7 +63,7 @@ async fn main() -> Result<()> {
 
     // Create a download list from the regions defined in the configuration.
     let region_download_list =
-        download::create_download_list(&config.regions, &config.download_base_url);
+        download::create_download_list(&config.regions, &config.osm_download_base_url);
 
     let http_client = Arc::new(reqwest::Client::new());
 
