@@ -9,5 +9,3 @@ data:
   MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY: haydov.osm
   MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY: fanout
   MINIO_NOTIFY_AMQP_URL_PRIMARY: amqp://haydov_test_user:haydov_test_password@message:5672/
-  MINIO_ROOT_PASSWORD: haydov_test_secret_access_key
-  MINIO_ROOT_USER: haydov_test_access_key_id

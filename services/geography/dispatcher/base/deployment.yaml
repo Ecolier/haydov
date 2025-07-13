@@ -15,8 +15,6 @@ spec:
       containers:
         - name: geography-dispatcher
           image: geography-dispatcher:latest
-          tty: true
-          stdin: true
           envFrom:
             - configMapRef:
                 name: geography-dispatcher-config

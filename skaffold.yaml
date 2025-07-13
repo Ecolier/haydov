@@ -2,6 +2,7 @@ apiVersion: skaffold/v4beta13
 kind: Config
 metadata:
   name: haydov
+  
 build:
   artifacts:
     - image: geography-dispatcher
@@ -13,15 +14,22 @@ build:
         manual:
           - src: 'services/geography/dispatcher/src/**'
             dest: '/app/src'
+    - image: geography-storage
+      context: services/geography/storage
+      docker:
+        dockerfile: Dockerfile
+
 manifests:
   kustomize:
     paths:
       - services/geography
+      - services/geography/storage/base
       - services/geography/dispatcher/base
-      - services/geography/dispatcher/overlays/dev
   rawYaml:
-    - services/geography/dispatcher/base/deployment.yaml
-    - services/geography/dispatcher/base/service.yaml
     - services/message-broker/deployment.yaml
     - services/message-broker/service.yaml
+    - services/geography/storage/base/deployment.yaml
+    - services/geography/storage/base/service.yaml
+    - services/geography/dispatcher/base/deployment.yaml
+    - services/geography/dispatcher/base/service.yaml
   
