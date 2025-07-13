@@ -6,7 +6,9 @@ RUN chmod +x /usr/bin/jq
 WORKDIR /app
 
 ADD --chown=minio:minio . .
+
+RUN chmod +x ./scripts/entrypoint.sh
 RUN chmod +x ./scripts/configure.sh
 
-ENTRYPOINT [ "/bin/sh", "-c"]
-CMD ["./scripts/configure.sh & minio server --console-address :9001 /data"]
+ENTRYPOINT ["./scripts/entrypoint.sh"]
+CMD []

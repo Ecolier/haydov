@@ -19,17 +19,32 @@ build:
       docker:
         dockerfile: Dockerfile
 
+portForward:
+  - resourceType: service
+    resourceName: message-broker
+    port: 15672
+    localPort: 15672
+
 manifests:
   kustomize:
     paths:
+      - services/message-broker
       - services/geography
       - services/geography/storage/base
       - services/geography/dispatcher/base
   rawYaml:
-    - services/message-broker/deployment.yaml
-    - services/message-broker/service.yaml
     - services/geography/storage/base/deployment.yaml
     - services/geography/storage/base/service.yaml
     - services/geography/dispatcher/base/deployment.yaml
     - services/geography/dispatcher/base/service.yaml
   
+deploy:
+  helm:
+    releases:
+      - name: message-broker
+        remoteChart: rabbitmq
+        version: 16.0.10
+        repo: https://charts.bitnami.com/bitnami
+        valuesFiles:
+          - services/message-broker/values.yaml
+        upgradeOnChange: true

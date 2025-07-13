@@ -12,6 +12,18 @@ spec:
       labels:
         app: geography-storage
     spec:
+      initContainers:
+        - name: wait-for-message-broker
+          image: curlimages/curl
+          command: ["sh", "-c"]
+          args:
+            - |
+              until curl -sf http://message-broker:15672/api/health/checks/alarms \
+                -u guest:guest; do
+                echo "Waiting for RabbitMQ to be healthy..."
+                sleep 2
+              done
+              echo "RabbitMQ is healthy!"
       containers:
         - name: geography-storage
           image: geography-storage:latest
@@ -20,6 +32,8 @@ spec:
                 name: geography-storage-config
             - configMapRef:
                 name: geography-config
+            - secretRef:
+                name: message-broker-credentials
           env:
             - name: MINIO_ROOT_USER
               valueFrom:

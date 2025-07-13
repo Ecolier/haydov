@@ -1,0 +1,8 @@
+rabbitmq.username: message-broker-credentials
+rabbitmq.password: message-broker-credentials
+rabbitmq.defaultUser: message-broker-credentials
+rabbitmq.defaultPass: message-broker-credentials
+rabbitmq.service.type: ClusterIP
+rabbitmq.service.port: 5672
+rabbitmq.management.enabled: true
+rabbitmq.management.port: 15672
