@@ -3,14 +3,6 @@ name = "geography-dispatcher"
 version = "0.1.0"
 edition = "2024"
 
-[[bin]]
-name = "pull"
-path = "src/pull.rs"
-
-[[bin]]
-name = "server"
-path = "src/server.rs"
-
 [dependencies]
 anyhow = "1.0.98"
 async-trait = "0.1.88"
@@ -30,3 +22,6 @@ thiserror = "2.0.12"
 tokio = { version = "1.45.1", features = ["full"] }
 tower = "0.5.2"
 url = { version = "2.5.4", features = ["serde"] }
+
+[dev-dependencies]
+bacon = "3.16.0"

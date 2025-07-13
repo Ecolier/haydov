@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geography-dispatcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geography-dispatcher
+  template:
+    metadata:
+      labels:
+        app: geography-dispatcher
+    spec:
+      containers:
+        - name: geography-dispatcher
+          image: geography-dispatcher:latest
+          tty: true
+          stdin: true
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

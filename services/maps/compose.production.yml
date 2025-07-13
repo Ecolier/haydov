@@ -1,6 +1,0 @@
-services:
-  maps:
-    build: 
-      target: production
-    labels:
-      - "traefik.http.routers.haydov.rule=Host(`maps.haydov.com`)"

@@ -1,5 +1,0 @@
-services:
-  geography-dispatcher:
-    image: haydov/geography:latest
-    labels:
-      - "traefik.http.routers.haydov.rule=Host(`geography.haydov.com`)"
