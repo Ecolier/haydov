@@ -1,8 +1,23 @@
-rabbitmq.username: message-broker-credentials
-rabbitmq.password: message-broker-credentials
-rabbitmq.defaultUser: message-broker-credentials
-rabbitmq.defaultPass: message-broker-credentials
-rabbitmq.service.type: ClusterIP
-rabbitmq.service.port: 5672
-rabbitmq.management.enabled: true
-rabbitmq.management.port: 15672
+fullnameOverride: message-broker
+
+auth:
+  username: admin
+  existingPasswordSecret: message-broker-credentials
+  existingSecretPasswordKey: MESSAGE_BROKER_PASSWORD
+  
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+service:
+  type: ClusterIP

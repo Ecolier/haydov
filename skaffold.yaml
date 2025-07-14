@@ -2,7 +2,7 @@ apiVersion: skaffold/v4beta13
 kind: Config
 metadata:
   name: haydov
-  
+
 build:
   artifacts:
     - image: geography-dispatcher
@@ -37,8 +37,6 @@ manifests:
     - services/geography/storage/base/service.yaml
     - services/geography/dispatcher/base/deployment.yaml
     - services/geography/dispatcher/base/service.yaml
-  
-deploy:
   helm:
     releases:
       - name: message-broker
