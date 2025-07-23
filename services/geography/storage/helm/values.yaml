@@ -1,0 +1,68 @@
+fullnameOverride: geography-storage
+
+extraVolumes:
+  - name: scripts-volume
+    configMap:
+      name: geography-storage-scripts
+
+sidecars:
+  - name: configure-minio
+    image: bitnami/minio-client:latest
+    command: ["/bin/sh"]
+    args: 
+      - /scripts/configure-minio.sh
+    volumeMounts:
+      - name: scripts-volume
+        mountPath: /scripts
+    envFrom:
+      - configMapRef:
+          name: geography-storage-config
+    env:
+      - name: MINIO_SERVER_HOST
+        value: "geography-storage"
+      - name: MINIO_SERVER_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: geography-storage-credentials
+            key: GEOGRAPHY_STORAGE_ACCESS_KEY_ID
+      - name: MINIO_SERVER_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: geography-storage-credentials
+            key: GEOGRAPHY_STORAGE_SECRET_ACCESS_KEY
+
+extraVolumeMounts:
+  - name: scripts-volume
+    mountPath: /scripts
+
+command: ["/bin/sh"]
+args: 
+  - /scripts/start-minio.sh
+
+auth:
+  existingSecret: geography-storage-credentials
+  rootUserSecretKey: GEOGRAPHY_STORAGE_ACCESS_KEY_ID
+  rootPasswordSecretKey: GEOGRAPHY_STORAGE_SECRET_ACCESS_KEY
+
+extraEnvVars:
+  - name: MINIO_NOTIFY_AMQP_ENABLE_PRIMARY
+    value: "on"
+
+extraEnvVarsSecret: message-broker-credentials
+
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+service:
+  type: ClusterIP

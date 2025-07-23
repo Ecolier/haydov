@@ -1,8 +1,0 @@
-secretGenerator:
-- name: geography-credentials
-  envs: 
-    - .env.secret
-generatorOptions:
-  disableNameSuffixHash: true
-resources:
-  - configmap.yaml

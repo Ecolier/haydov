@@ -4,6 +4,11 @@ metadata:
   name: haydov
 
 build:
+  local:
+    push: false
+    useBuildkit: true
+    useDockerCLI: true
+
   artifacts:
     - image: geography-dispatcher
       context: services/geography/dispatcher
@@ -14,29 +19,26 @@ build:
         manual:
           - src: 'services/geography/dispatcher/src/**'
             dest: '/app/src'
-    - image: geography-storage
-      context: services/geography/storage
-      docker:
-        dockerfile: Dockerfile
 
 portForward:
   - resourceType: service
     resourceName: message-broker
     port: 15672
     localPort: 15672
+  - resourceType: service
+    resourceName: geography-storage-console
+    port: 9090
+    localPort: 9090
 
 manifests:
   kustomize:
     paths:
       - services/message-broker
-      - services/geography
-      - services/geography/storage/base
-      - services/geography/dispatcher/base
+      - services/geography/storage
+      - services/geography/dispatcher
   rawYaml:
-    - services/geography/storage/base/deployment.yaml
-    - services/geography/storage/base/service.yaml
-    - services/geography/dispatcher/base/deployment.yaml
-    - services/geography/dispatcher/base/service.yaml
+    - services/geography/storage/configmap.yaml
+    - services/geography/dispatcher/service.yaml
   helm:
     releases:
       - name: message-broker
@@ -44,5 +46,13 @@ manifests:
         version: 16.0.10
         repo: https://charts.bitnami.com/bitnami
         valuesFiles:
-          - services/message-broker/values.yaml
+          - services/message-broker/helm/values.yaml
+        upgradeOnChange: true
+
+      - name: geography-storage
+        remoteChart: minio
+        version: 17.0.12
+        repo: https://charts.bitnami.com/bitnami
+        valuesFiles:
+          - services/geography/storage/helm/values.yaml
         upgradeOnChange: true

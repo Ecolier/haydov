@@ -1,0 +1,11 @@
+configMapGenerator:
+  - name: geography-storage-scripts
+    files:
+      - ./scripts/configure-minio.sh
+      - ./scripts/start-minio.sh
+secretGenerator:
+- name: geography-storage-credentials
+  envs: 
+    - .env.secret
+generatorOptions:
+  disableNameSuffixHash: true
