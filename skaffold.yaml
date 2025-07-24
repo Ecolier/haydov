@@ -10,6 +10,18 @@ build:
     useDockerCLI: true
 
   artifacts:
+    - image: pnpm-root
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        target: pnpm-root
+
+    - image: cargo-root
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        target: cargo-root
+
     - image: geography-dispatcher
       context: services/geography/dispatcher
       docker:
@@ -19,8 +31,12 @@ build:
         manual:
           - src: "services/geography/dispatcher/src/**"
             dest: "/app/src"
+
     - image: geography-importer
       context: services/geography/importer
+      requires:
+        - image: "pnpm-root"
+          alias: "workspace_root"
       docker:
         dockerfile: Dockerfile
         target: development
