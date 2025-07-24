@@ -17,8 +17,17 @@ build:
         target: development
       sync:
         manual:
-          - src: 'services/geography/dispatcher/src/**'
-            dest: '/app/src'
+          - src: "services/geography/dispatcher/src/**"
+            dest: "/app/src"
+    - image: geography-importer
+      context: services/geography/importer
+      docker:
+        dockerfile: Dockerfile
+        target: development
+      sync:
+        manual:
+          - src: "services/geography/importer/src/**"
+            dest: "/app/src"
 
 portForward:
   - resourceType: service

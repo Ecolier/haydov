@@ -1,6 +1,6 @@
 secretGenerator:
-- name: message-broker-credentials
-  envs: 
-    - .env.secret
+  - name: message-broker-credentials
+    envs:
+      - .env.secret
 generatorOptions:
   disableNameSuffixHash: true

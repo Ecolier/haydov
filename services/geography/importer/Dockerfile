@@ -1,4 +1,6 @@
-FROM pelias/openstreetmap:master AS pelias
+FROM pelias/openstreetmap:master AS pelias-openstreetmap
+FROM pelias/whosonfirst:master AS pelias-whosonfirst
+FROM pelias/openaddresses:master AS pelias-openaddresses
 
 FROM node:current AS deps
 
@@ -17,7 +19,7 @@ COPY ./package.json ./services/geocoding/importer/
 RUN pnpm install --frozen-lockfile
 
 # Copy the Pelias codebase
-COPY --from=pelias /code /code
+COPY --from=pelias-openstreetmap /code /code
 
 # Copy the geocoding-importer service code
 COPY . ./services/geocoding/importer/

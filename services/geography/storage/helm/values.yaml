@@ -9,7 +9,7 @@ sidecars:
   - name: configure-minio
     image: bitnami/minio-client:latest
     command: ["/bin/sh"]
-    args: 
+    args:
       - /scripts/configure-minio.sh
     volumeMounts:
       - name: scripts-volume
@@ -36,7 +36,7 @@ extraVolumeMounts:
     mountPath: /scripts
 
 command: ["/bin/sh"]
-args: 
+args:
   - /scripts/start-minio.sh
 
 auth:

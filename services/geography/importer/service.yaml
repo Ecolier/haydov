@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geography-importer
+spec:
+  selector:
+    app: geography-importer
+  ports:
+    - port: 3000

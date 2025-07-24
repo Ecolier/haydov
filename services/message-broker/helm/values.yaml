@@ -4,7 +4,7 @@ auth:
   username: admin
   existingPasswordSecret: message-broker-credentials
   existingSecretPasswordKey: MESSAGE_BROKER_PASSWORD
-  
+
 persistence:
   enabled: false
 
