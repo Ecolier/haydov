@@ -1,3 +1,7 @@
+configMapGenerator:
+  - name: message-broker-config
+    envs:
+      - .env
 secretGenerator:
   - name: message-broker-credentials
     envs:

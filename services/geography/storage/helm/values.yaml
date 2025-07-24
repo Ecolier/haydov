@@ -16,20 +16,11 @@ sidecars:
         mountPath: /scripts
     envFrom:
       - configMapRef:
+          name: geography-config
+      - configMapRef:
           name: geography-storage-config
-    env:
-      - name: MINIO_SERVER_HOST
-        value: "geography-storage"
-      - name: MINIO_SERVER_ACCESS_KEY
-        valueFrom:
-          secretKeyRef:
-            name: geography-storage-credentials
-            key: GEOGRAPHY_STORAGE_ACCESS_KEY_ID
-      - name: MINIO_SERVER_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: geography-storage-credentials
-            key: GEOGRAPHY_STORAGE_SECRET_ACCESS_KEY
+      - secretRef:
+          name: geography-storage-credentials
 
 extraVolumeMounts:
   - name: scripts-volume
@@ -41,13 +32,14 @@ args:
 
 auth:
   existingSecret: geography-storage-credentials
-  rootUserSecretKey: GEOGRAPHY_STORAGE_ACCESS_KEY_ID
-  rootPasswordSecretKey: GEOGRAPHY_STORAGE_SECRET_ACCESS_KEY
+  rootUserSecretKey: GEOGRAPHY_STORAGE_USERNAME
+  rootPasswordSecretKey: GEOGRAPHY_STORAGE_PASSWORD
 
 extraEnvVars:
   - name: MINIO_NOTIFY_AMQP_ENABLE_PRIMARY
     value: "on"
 
+extraEnvVarsCM: message-broker-config
 extraEnvVarsSecret: message-broker-credentials
 
 persistence:

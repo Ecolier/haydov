@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: geography-storage-config
-data:
-  BUCKET_NAME: geography-data

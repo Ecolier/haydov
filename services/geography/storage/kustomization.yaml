@@ -3,6 +3,9 @@ configMapGenerator:
     files:
       - ./scripts/configure-minio.sh
       - ./scripts/start-minio.sh
+  - name: geography-storage-config
+    envs:
+      - .env
 secretGenerator:
   - name: geography-storage-credentials
     envs:

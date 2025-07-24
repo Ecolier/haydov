@@ -1,6 +1,0 @@
-configMapGenerator:
-  - name: geography-dispatcher-config
-    envs:
-      - .env
-resources:
-  - deployment.yaml

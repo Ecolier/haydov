@@ -14,13 +14,16 @@ spec:
     spec:
       initContainers:
         - name: wait-for-storage
+          envFrom:
+            - configMapRef:
+                name: geography-storage-config
           image: busybox
           command:
             - sh
             - -c
             - |
               echo "Waiting for storage to be ready..."
-              until wget -qO- http://geography-storage:9000/minio/health/ready; do
+              until wget -qO- $GEOGRAPHY_STORAGE_BASE_URL/minio/health/ready; do
                 echo "Storage not ready yet..."
                 sleep 2
               done
@@ -30,11 +33,15 @@ spec:
           image: geography-importer:latest
           envFrom:
             - configMapRef:
-                name: geography-importer-config
+                name: geography-config
             - configMapRef:
                 name: geography-storage-config
             - secretRef:
                 name: geography-storage-credentials
+            - configMapRef:
+                name: message-broker-config
+            - secretRef:
+                name: message-broker-credentials
           ports:
             - containerPort: 3000
           resources:
