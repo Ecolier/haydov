@@ -26,12 +26,17 @@ const CHUNK_SIZE: usize = 5 * 1024 * 1024;
 #[tokio::main]
 async fn main() -> Result<()> {
 
+    // Load environment variables from .env file
+    dotenvy::dotenv()?;
+    dotenvy::from_filename(".env.secret")?;
+
     // Load configuration from config.json and environment variables
     let config = config::Config::builder()
         .add_source(config::File::with_name("config.json"))
         .add_source(config::Environment::default())
-        .add_source(config::Environment::with_prefix("GEOGRAPHY"))
         .build()?;
+
+    println!("{:#?}", config);
 
     // Deserialize the configuration into the Settings struct
     // This will fail if the structure does not match the expected format
@@ -42,16 +47,16 @@ async fn main() -> Result<()> {
     // This will use the AWS SDK to create a new S3 bucket if it does not already exist.
     // If the bucket already exists, it will return an error.
     let credentials = Credentials::new(
-        &config.storage_access_key_id,
-        &config.storage_secret_access_key,
+        &config.geography_storage_username,
+        &config.geography_storage_password,
         None,
         None,
         "loaded-from-custom-env",
     );
     let s3_config = aws_sdk_s3::config::Builder::new()
-        .endpoint_url(&config.aws_s3_endpoint)
+        .endpoint_url(&config.geography_storage_base_url.to_string())
         .credentials_provider(credentials)
-        .region(Region::new("eu-central-1"))
+        .region(Region::new(config.geography_storage_region.clone()))
         .behavior_version_latest()
         .force_path_style(true) // apply bucketname as path param instead of pre-domain
         .build();
@@ -84,7 +89,7 @@ async fn main() -> Result<()> {
         .try_for_each_concurrent(stream_concurrent_requests, |(object, url)| {
             let http_client = http_client.clone();
             let storage_client = storage_client.clone();
-            let value = config.clone();
+            let config = config.clone();
 
             let object = format!("batches/{}/{}-{}", date_prefix, batch_id, &object);
 
@@ -94,7 +99,7 @@ async fn main() -> Result<()> {
                 
                 let multipart_upload = storage_client
                     .create_multipart_upload()
-                    .bucket(&value.bucket_name)
+                    .bucket(&config.geography_raw_bucket_name)
                     .key(&object)
                     .send()
                     .await?;
@@ -114,7 +119,7 @@ async fn main() -> Result<()> {
 
                         let upload_part_resp = storage_client
                             .upload_part()
-                            .bucket(&value.bucket_name)
+                            .bucket(&config.geography_raw_bucket_name)
                             .key(&object)
                             .part_number(parts_count)
                             .body(ByteStream::from(part_bytes))
@@ -139,7 +144,7 @@ async fn main() -> Result<()> {
 
                     let upload_part_resp = storage_client
                         .upload_part()
-                        .bucket(&value.bucket_name)
+                        .bucket(&config.geography_raw_bucket_name)
                         .key(&object)
                         .part_number(parts_count)
                         .body(ByteStream::from(final_part))
@@ -161,7 +166,7 @@ async fn main() -> Result<()> {
 
                 storage_client
                     .complete_multipart_upload()
-                    .bucket(&value.bucket_name)
+                    .bucket(&config.geography_raw_bucket_name)
                     .key(&object)
                     .multipart_upload(completed_upload)
                     .upload_id(upload_id)
@@ -179,7 +184,7 @@ async fn main() -> Result<()> {
     // This file will be used to indicate that the batch of downloads is complete and ready for processing.
     storage_client
         .put_object()
-        .bucket(&config.bucket_name)
+        .bucket(&config.geography_raw_bucket_name)
         .key(format!("batches/{}/{}_READY", date_prefix, batch_id))
         .send()
         .await?;
