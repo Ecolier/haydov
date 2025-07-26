@@ -1,4 +1,6 @@
 packages:
   - apps/mobile
   - services/geography/importer
-nodeLinker: hoisted
+syncInjectedDepsAfterScripts:
+- build
+injectWorkspacePackages: true

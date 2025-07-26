@@ -1,0 +1,6 @@
+*
+
+!src/
+!bacon.toml
+!Cargo.toml
+!Cargo.lock

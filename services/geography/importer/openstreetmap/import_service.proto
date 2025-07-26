@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+service ImportService {
+  rpc RunImport (ImportRequest) returns (ImportResponse);
+}
+
+message ImportRequest {
+  enum Command {
+    IMPORT = 0;
+    REINDEX = 1;
+  }
+  Command command = 1;
+  repeated string args = 2; // optional, if needed
+}
+
+message ImportResponse {
+  string stdout = 1;
+  string stderr = 2;
+  int32 exit_code = 3;
+}

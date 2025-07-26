@@ -1,0 +1,8 @@
+*
+
+!Cargo.lock
+!Cargo.toml
+!nx.json
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml

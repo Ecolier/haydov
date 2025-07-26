@@ -11,6 +11,8 @@ import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { exec, spawn } from "child_process";
 
+import a from "pelias-openaddresses"
+
 configDotenv();
 
 const env = cleanEnv(process.env, {

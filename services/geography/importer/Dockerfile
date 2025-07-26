@@ -1,45 +1,66 @@
-ARG workspace_root
+# This is the root of the workspace,
+# where the pnpm workspace and nx files are located.
+ARG workspace_root=workspace-root
+ARG package_path=services/geography/importer
+ARG package_name=geography-importer
+
+FROM ${workspace_root} AS workspace-root
 
 FROM pelias/openstreetmap:master AS pelias-openstreetmap
 FROM pelias/whosonfirst:master AS pelias-whosonfirst
 FROM pelias/openaddresses:master AS pelias-openaddresses
 
-FROM ${workspace_root} AS workspace-root
+FROM scratch AS pelias
 
-FROM node:current AS development
+# Copy Pelias data to a common location
+COPY --from=pelias-openstreetmap /code/pelias /
+COPY --from=pelias-whosonfirst /code/pelias /
+COPY --from=pelias-openaddresses /code/pelias /
+
+FROM node:current-slim AS pnpm-base
+
+ARG package_path
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY --from=workspace-root / /app/
+COPY ./package.json ./tsconfig.json /app/${package_path}/
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+FROM pnpm-base AS dev
 
-# Copy and install dependencies
-COPY --from=workspace-root / ./
+ARG package_path
 
-COPY ./package.json ./services/geocoding/importer/
+# Install dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-RUN pnpm install --frozen-lockfile
-
-# Copy the Pelias codebase
-COPY --from=pelias-openstreetmap /code /code
-COPY --from=pelias-whosonfirst /code /code
-COPY --from=pelias-openaddresses /code /code
+# Copy third-party dependencies from Pelias
+COPY --from=pelias / /third-party
 
 # Copy the geography-importer service code
-COPY . ./services/geography/importer/
-
-# Build the application
-RUN pnpm nx build geography-importer
+COPY ./src ./${package_path}/src
 
 EXPOSE 3000
 ENTRYPOINT [ "pnpm" ]
 CMD [ "nx", "dev", "geography-importer" ]
 
-# FROM node:current AS builder
+FROM pnpm-base AS build
 
-# WORKDIR /app
+ARG package_name
 
-# RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# COPY --from=deps /app .
+COPY ./src ./${package_path}/src
+RUN pnpm nx build geography-importer
 
-# RUN pnpm nx build my-app
+RUN pnpm deploy --filter=${package_name} --prod /dist
+
+FROM pnpm-base AS prod
+
+COPY --from=build /dist /dist
+WORKDIR /dist
+EXPOSE 3000
+CMD [ "pnpm", "start" ]
