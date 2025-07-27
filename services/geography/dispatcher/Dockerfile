@@ -1,3 +1,5 @@
+ARG workspace_root=workspace-root
+
 FROM rust:1.88 AS chef
 
 RUN cargo install cargo-chef
@@ -22,7 +24,7 @@ WORKDIR /root
 ENV CARGO_HOME=/root/.cargo
 RUN cargo install --locked bacon
 
-FROM chef AS development 
+FROM chef AS dev 
 
 COPY --from=bacon-cache /root/.cargo /root/.cargo
 
@@ -37,7 +39,7 @@ COPY . .
 EXPOSE 3000
 CMD ["bacon", "--headless"]
 
-FROM debian:bookworm-slim AS production
+FROM debian:bookworm-slim AS prod
 
 WORKDIR /app
 

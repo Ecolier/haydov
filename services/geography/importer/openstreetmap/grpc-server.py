@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import grpc
 from concurrent import futures
 import subprocess
@@ -16,13 +17,9 @@ class ImportServicer(import_service_pb2_grpc.ImportServiceServicer):
         try:
             if request.command == import_service_pb2.ImportRequest.IMPORT:
                 # Run the OpenStreetMap import
-                cmd = ["/code/pelias/openstreetmap/bin/import"]
+                cmd = [os.getenv('PELIAS_IMPORT_CMD', '/code/pelias/openstreetmap/bin/import')]
                 cmd.extend(request.args)
                 
-            elif request.command == import_service_pb2.ImportRequest.REINDEX:
-                # Run reindex command
-                cmd = ["/code/pelias/openstreetmap/bin/reindex"]
-                cmd.extend(request.args)
             else:
                 return import_service_pb2.ImportResponse(
                     stdout="",
@@ -64,8 +61,8 @@ def serve():
     import_service_pb2_grpc.add_ImportServiceServicer_to_server(
         ImportServicer(), server
     )
-    
-    listen_addr = '0.0.0.0:50051'
+
+    listen_addr = f"{os.getenv('OPENSTREETMAP_IMPORTER_HOST', '0.0.0.0')}:{os.getenv('OPENSTREETMAP_IMPORTER_PORT', 50051)}"
     server.add_insecure_port(listen_addr)
     
     logger.info(f"Starting gRPC server on {listen_addr}")

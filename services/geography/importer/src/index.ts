@@ -1,6 +1,9 @@
+import env from "./config.js";
+
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { configDotenv } from "dotenv";
-import { cleanEnv, host, port, str, url } from "envalid";
 import { S3Event } from "aws-lambda";
 import { connect } from "amqplib";
 
@@ -9,24 +12,6 @@ import path from "path";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
-import { exec, spawn } from "child_process";
-
-import a from "pelias-openaddresses"
-
-configDotenv();
-
-const env = cleanEnv(process.env, {
-  GEOGRAPHY_STORAGE_BASE_URL: url(),
-  GEOGRAPHY_STORAGE_USERNAME: str(),
-  GEOGRAPHY_STORAGE_PASSWORD: str(),
-  GEOGRAPHY_STORAGE_REGION: str(),
-  GEOGRAPHY_RAW_BUCKET_NAME: str(),
-  MESSAGE_BROKER_SCHEMA: str(),
-  MESSAGE_BROKER_HOST: host(),
-  MESSAGE_BROKER_PORT: port(),
-  MESSAGE_BROKER_USERNAME: str(),
-  MESSAGE_BROKER_PASSWORD: str(),
-});
 
 const client = new S3Client({
   endpoint: env.GEOGRAPHY_STORAGE_BASE_URL,
@@ -38,10 +23,24 @@ const client = new S3Client({
   },
 });
 
+// Load protobuf definition
+const packageDefinition = protoLoader.loadSync('./openstreetmap/.proto', {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+
+const importService = grpc.loadPackageDefinition(packageDefinition).ImportService as any;
+
+const grpcClient = new importService(
+  `${env.OPENSTREETMAP_IMPORTER_HOST}:${env.OPENSTREETMAP_IMPORTER_PORT}`,
+  grpc.credentials.createInsecure()
+);
+
 const exchange = "haydov.geography";
 const queue = "dispatch";
-
-console.log(`${env.MESSAGE_BROKER_SCHEMA}://${env.MESSAGE_BROKER_USERNAME}:${env.MESSAGE_BROKER_PASSWORD}@${env.MESSAGE_BROKER_HOST}:${env.MESSAGE_BROKER_PORT}`);
 
 (async () => {
   try {
@@ -85,10 +84,6 @@ console.log(`${env.MESSAGE_BROKER_SCHEMA}://${env.MESSAGE_BROKER_USERNAME}:${env
             filename: file,
           }));
           await writeFile("/code/pelias.json", JSON.stringify(config, null, 2));
-          spawn(`cd /code/pelias/openstreetmap && HOME=/code ./bin/start`, {
-            stdio: "inherit",
-            shell: true,
-          });
         }
         
         const objectBasename = path.basename(objectKey);

@@ -6,17 +6,6 @@ ARG package_name=geography-importer
 
 FROM ${workspace_root} AS workspace-root
 
-FROM pelias/openstreetmap:master AS pelias-openstreetmap
-FROM pelias/whosonfirst:master AS pelias-whosonfirst
-FROM pelias/openaddresses:master AS pelias-openaddresses
-
-FROM scratch AS pelias
-
-# Copy Pelias data to a common location
-COPY --from=pelias-openstreetmap /code/pelias /
-COPY --from=pelias-whosonfirst /code/pelias /
-COPY --from=pelias-openaddresses /code/pelias /
-
 FROM node:current-slim AS pnpm-base
 
 ARG package_path
@@ -36,9 +25,6 @@ ARG package_path
 
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-
-# Copy third-party dependencies from Pelias
-COPY --from=pelias / /third-party
 
 # Copy the geography-importer service code
 COPY ./src ./${package_path}/src
