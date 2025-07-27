@@ -5,30 +5,13 @@ extraVolumes:
     configMap:
       name: geography-storage-scripts
 
-sidecars:
-  - name: configure-minio
-    image: bitnami/minio-client:latest
-    command: ["/bin/sh"]
-    args:
-      - /scripts/configure-minio.sh
-    volumeMounts:
-      - name: scripts-volume
-        mountPath: /scripts
-    envFrom:
-      - configMapRef:
-          name: geography-config
-      - configMapRef:
-          name: geography-storage-config
-      - secretRef:
-          name: geography-storage-credentials
-
 extraVolumeMounts:
   - name: scripts-volume
     mountPath: /scripts
 
 command: ["/bin/sh"]
 args:
-  - /scripts/start-minio.sh
+  - /scripts/start.sh
 
 auth:
   existingSecret: geography-storage-credentials

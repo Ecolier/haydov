@@ -75,7 +75,10 @@ helm_resource(
     namespace='haydov',
     flags=[
         '--version=16.0.10',
-        '--values=services/message-broker/helm/values.yaml'
+        '--values=services/message-broker/helm/values.yaml',
+    ],
+    resource_deps=[
+        'message-broker-credentials',
     ],
     port_forwards=[
         port_forward(15672, 15672, name='rabbitmq-management')
@@ -90,6 +93,14 @@ helm_resource(
     flags=[
         '--version=17.0.12',
         '--values=services/geography/storage/helm/values.yaml'
+    ],
+    resource_deps=[
+        'geography-config',
+        'geography-storage-config',
+        'geography-storage-credentials',
+        'geography-storage-scripts',
+        'message-broker-config',
+        'message-broker-credentials',
     ],
     port_forwards=[
         port_forward(9090, 9090, name='minio-console')
@@ -106,8 +117,11 @@ k8s_yaml([
     './services/geography/dispatcher/deployment.yaml',
     './services/geography/dispatcher/service.yaml', 
     './services/geography/importer/deployment.yaml',
-    './services/geography/importer/service.yaml'
+    './services/geography/importer/service.yaml',
+    './services/geography/storage/bootstrap.yaml'
 ])
+
+k8s_resource('geography-storage-bootstrap', resource_deps=['geography-storage'])
 
 # Create k8s resources for your services
 k8s_resource('geography-dispatcher', 

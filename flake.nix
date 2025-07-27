@@ -43,15 +43,23 @@
             echo ""
             
             echo "🔧 Quick commands:"
-            echo "  nix run .#deploy     # Deploy services to Kubernetes"
+            echo "  nix run .#deploy     # Deploy services"
+            echo "  nix run .#clean      # Clean up resources"
           '';
         };
 
         packages = {
           deploy = pkgs.writeShellScriptBin "deploy" ''
-            echo "🚀 Deploying services..."
-            kubectl create namespace haydov || true
+            echo "🔄 Creating or reusing Kubernetes namespace 'haydov'..."
+            kubectl create namespace haydov 2>/dev/null || true
+            echo "🌐 Deploying services to Kubernetes..."
             tilt up --namespace haydov || true
+          '';
+          clean = pkgs.writeShellScriptBin "clean" ''
+            echo "🧹 Cleaning up Tilt resources..."
+            tilt down --namespace haydov || true
+            echo "🔄 Deleting Kubernetes namespace 'haydov'..."
+            kubectl delete namespace haydov 2>/dev/null || true
           '';
         };
 
@@ -59,6 +67,10 @@
           deploy = {
             type = "app";
             program = "${self.packages.${system}.deploy}/bin/deploy";
+          };
+          clean = {
+            type = "app";
+            program = "${self.packages.${system}.clean}/bin/clean";
           };
         };
       });

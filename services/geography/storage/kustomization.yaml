@@ -1,8 +1,8 @@
 configMapGenerator:
   - name: geography-storage-scripts
     files:
-      - ./scripts/configure-minio.sh
-      - ./scripts/start-minio.sh
+      - ./scripts/configure.sh
+      - ./scripts/start.sh
   - name: geography-storage-config
     envs:
       - .env
