@@ -1,0 +1,26 @@
+dispatcher:
+  concurrent_requests: 4
+  chunk_size: 5242880 # 5 MB
+  bucket_name: osm-data
+
+schema:
+  base_url: https://download.geofabrik.de
+  filename_template: "{region}-latest.osm.pbf"
+  regions:
+    - europe:
+        - montenegro
+        - malta
+        - macedonia
+        - france:
+            - guyane
+    - north-america:
+        - united-states:
+            - california
+
+script: ./examples/geofabrik-parser.rhai
+
+storage:
+  base_url: localhost:9000
+  region: us-east-1
+  username: minio
+  password: minio123

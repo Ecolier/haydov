@@ -3,5 +3,4 @@ resolver = "3"
 members = [
   "maps/packages/utils",
   "maps/packages/dispatcher",
-  "maps/services/osm-dispatcher",
 ]

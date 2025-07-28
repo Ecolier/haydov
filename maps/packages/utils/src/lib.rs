@@ -1,1 +1,3 @@
-pub mod upload_stream;
+mod upload_stream;
+
+pub use upload_stream::S3ClientExt;
