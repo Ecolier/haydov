@@ -1,6 +1,6 @@
-use url::{Url};
+use url::{ParseError, Url};
 
-use crate::{errors::Error, region::Region};
+use crate::region::Region;
 
 /// Collects URLs from the given regions and constructs full URLs based on the base path.
 /// This function recursively traverses the regions, appending paths to the base URL
@@ -8,7 +8,7 @@ use crate::{errors::Error, region::Region};
 fn collect_urls<'a>(
     regions: &'a Vec<Region>,
     base_path: &Url,
-    out_list: &mut Vec<Result<(&'a str, Url), Error>>,
+    out_list: &mut Vec<Result<(&'a str, Url), ParseError>>,
 ) {
     for region in regions {
         match region {
@@ -18,12 +18,12 @@ fn collect_urls<'a>(
                 regions,
             } => match base_path.join(&path) {
                 Ok(new_base) => collect_urls(regions, &new_base, out_list),
-                Err(e) => out_list.push(Err(Error::ParseUrlError(e))),
+                Err(e) => out_list.push(Err(e)),
             },
             Region::Leaf { name: _, file } => {
                 match base_path.join(file) {
                     Ok(url) => out_list.push(Ok((file, url))),
-                    Err(e) => out_list.push(Err(Error::ParseUrlError(e))),
+                    Err(e) => out_list.push(Err(e)),
                 };
             }
         }
@@ -33,7 +33,7 @@ fn collect_urls<'a>(
 pub fn create_download_list<'a>(
     regions: &'a Vec<Region>,
     base_path: &Url,
-) -> Vec<Result<(&'a str, Url), Error>> {
+) -> Vec<Result<(&'a str, Url), ParseError>> {
     let mut download_list = Vec::new();
     collect_urls(regions, base_path, &mut download_list);
     download_list

@@ -1,0 +1,13 @@
+[package]
+name = "maps-dispatcher"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-trait = "0.1.88"
+aws-sdk-s3 = "1.100.0"
+bytes = "1.10.1"
+futures = "0.3.31"
+thiserror = "2.0.12"
+url = { version = "2.5.4", features = ["serde"] }
+reqwest = {version = "0.12.22", features = ["stream"] }
