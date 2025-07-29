@@ -1,0 +1,17 @@
+def install_message_broker():
+  message_broker = helm_resource(
+      'message-broker',
+      'bitnami/rabbitmq',
+      namespace='haydov',
+      flags=[
+          '--version=16.0.10',
+          '--values=services/message-broker/helm/values.yaml',
+      ],
+      resource_deps=[
+          'message-broker-credentials',
+      ],
+      port_forwards=[
+          port_forward(15672, 15672, name='rabbitmq-management')
+      ]
+  )
+  return message_broker

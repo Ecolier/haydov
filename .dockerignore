@@ -6,3 +6,9 @@
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
+
+!maps/services/downloader/Cargo.toml
+!maps/services/downloader/src/**/*.rs
+
+!maps/packages/utils/Cargo.toml
+!maps/packages/utils/src/**/*.rs
