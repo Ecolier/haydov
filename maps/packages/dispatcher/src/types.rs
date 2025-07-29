@@ -5,7 +5,7 @@ use serde_json::Value;
 pub struct Settings {
     pub dispatcher: DispatcherConfig,
     pub schema: Value,
-    pub script: String,
+    pub component: String,
     pub storage: StorageConfig,
 }
 

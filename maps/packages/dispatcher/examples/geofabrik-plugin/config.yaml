@@ -7,17 +7,13 @@ schema:
   base_url: https://download.geofabrik.de
   filename_template: "{region}-latest.osm.pbf"
   regions:
-    - europe:
-        - montenegro
-        - malta
-        - macedonia
-        - france:
-            - guyane
-    - north-america:
-        - united-states:
-            - california
+    - europe/montenegro
+    - europe/malta
+    - europe/macedonia
+    - europe/france/guyane
+    - north-america/united-states/california
 
-script: ./examples/geofabrik-parser.rhai
+component: ./examples/geofabrik-plugin/target/wasm32-wasip2/debug/geofabrik_plugin.wasm
 
 storage:
   base_url: localhost:9000

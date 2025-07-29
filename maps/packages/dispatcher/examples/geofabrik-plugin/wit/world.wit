@@ -1,0 +1,15 @@
+package maps:plugin;
+
+interface dispatcher {
+  record schema {
+    base-url: string,
+    filename-template: string,
+    regions: list<string>,
+  }
+
+  parse-urls: func(schema: schema) -> list<string>;
+}
+
+world dispatcher-world {
+  export dispatcher;
+}
