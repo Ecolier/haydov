@@ -4,7 +4,7 @@ downloader:
   bucket_name: osm-data
 
 provider:
-  component: ./target/wasm32-wasip2/debug/osm_data_provider.wasm
+  component: ./target/wasm32-wasip2/release/data_provider.wasm
   schema:
     base_url: https://download.geofabrik.de
     filename_template: "{region}-latest.osm.pbf"
