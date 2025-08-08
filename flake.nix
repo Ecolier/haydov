@@ -28,6 +28,7 @@
             docker
             kubectl
             kind
+            kustomize
           ];
 
           shellHook = ''
@@ -39,7 +40,7 @@
             echo "🚀 Haydov development environment ready!"
             echo ""
             echo "Available services:"
-            echo "  🌍 Geography Importer: http://localhost:5000"
+            echo "  🌍 Maps Importer: http://localhost:5000"
             echo ""
             
             echo "🔧 Quick commands:"

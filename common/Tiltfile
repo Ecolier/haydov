@@ -1,0 +1,19 @@
+load('ext://helm_resource', 'helm_resource')
+
+def install_common():
+  k8s_yaml([
+      './common/k8s/namespace.yaml',
+      kustomize('./common/services/message-broker/k8s'),
+  ])
+  helm_resource(
+      'message-broker',
+      'bitnami/rabbitmq',
+      namespace='haydov-common',
+      flags=[
+          '--version=16.0.10',
+          '--values=./common/services/message-broker/helm/values.yaml',
+      ],
+      port_forwards=[
+          port_forward(15672, 15672, name='rabbitmq-management')
+      ]
+  )

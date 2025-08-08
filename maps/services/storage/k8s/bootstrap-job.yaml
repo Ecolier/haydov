@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: maps-osm-dispatcher
+  name: storage-bootstrap
 spec:
   backoffLimit: 4
   template:
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: maps-downloader
+        - name: storage-bootstrap
           image: bitnami/minio-client:latest
           command: ["/bin/sh"]
           args:
@@ -18,12 +18,12 @@ spec:
               mountPath: /scripts
           envFrom:
             - configMapRef:
-                name: geography-config
+                name: config
             - configMapRef:
-                name: geography-storage-config
+                name: storage-config
             - secretRef:
-                name: geography-storage-credentials
+                name: storage-credentials
       volumes:
         - name: scripts-volume
           configMap:
-            name: geography-storage-scripts
+            name: storage-scripts

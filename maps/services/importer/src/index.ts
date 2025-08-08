@@ -14,12 +14,12 @@ import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 
 const client = new S3Client({
-  endpoint: env.GEOGRAPHY_STORAGE_BASE_URL,
-  region: env.GEOGRAPHY_STORAGE_REGION,
+  endpoint: env.MAPS_STORAGE_BASE_URL,
+  region: env.MAPS_STORAGE_REGION,
   forcePathStyle: true, // Required for MinIO or local S3-compatible services
   credentials: {
-    accessKeyId: env.GEOGRAPHY_STORAGE_USERNAME,
-    secretAccessKey: env.GEOGRAPHY_STORAGE_PASSWORD,
+    accessKeyId: env.MAPS_STORAGE_USERNAME,
+    secretAccessKey: env.MAPS_STORAGE_PASSWORD,
   },
 });
 
@@ -39,7 +39,7 @@ const grpcClient = new importService(
   grpc.credentials.createInsecure()
 );
 
-const exchange = "haydov.geography";
+const exchange = "haydov.maps";
 const queue = "dispatch";
 
 (async () => {

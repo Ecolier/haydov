@@ -1,7 +1,7 @@
 ARG rust_manifests=rust-manifests
 ARG utils_sources=utils-sources
 ARG data_provider=data-provider
-ARG workspace=maps/services/downloader
+ARG workspace=maps/packages/downloader
 
 FROM ${rust_manifests} AS manifests
 FROM ${utils_sources} AS utils-sources

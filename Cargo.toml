@@ -2,5 +2,5 @@
 resolver = "3"
 members = [
   "maps/packages/utils",
-  "maps/services/downloader",
+  "maps/packages/downloader",
 ]

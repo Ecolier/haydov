@@ -1,43 +1,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: geography-importer
+  name: maps-importer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: geography-importer
+      app: maps-importer
   template:
     metadata:
       labels:
-        app: geography-importer
+        app: maps-importer
     spec:
       initContainers:
         - name: wait-for-storage
           envFrom:
             - configMapRef:
-                name: geography-storage-config
+                name: maps-storage-config
           image: busybox:1.36
           command:
             - sh
             - -c
             - |
               echo "Waiting for storage to be ready..."
-              until wget -qO- $GEOGRAPHY_STORAGE_BASE_URL/minio/health/ready; do
+              until wget -qO- $MAPS_STORAGE_BASE_URL/minio/health/ready; do
                 echo "Storage not ready yet..."
                 sleep 2
               done
               echo "Storage ready, starting dispatcher..."
       containers:
-        - name: geography-importer
-          image: geography-importer:latest
+        - name: maps-importer
+          image: maps-importer:latest
           envFrom:
             - configMapRef:
-                name: geography-config
+                name: maps-config
             - configMapRef:
-                name: geography-storage-config
+                name: maps-storage-config
             - secretRef:
-                name: geography-storage-credentials
+                name: maps-storage-credentials
             - configMapRef:
                 name: message-broker-config
             - secretRef:

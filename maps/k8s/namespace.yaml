@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: haydov-maps
+  labels:
+    app.kubernetes.io/name: haydov-maps
+    app.kubernetes.io/part-of: haydov

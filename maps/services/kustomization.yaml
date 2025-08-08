@@ -1,6 +1,0 @@
-configMapGenerator:
-  - name: geography-config
-    envs:
-      - .env
-generatorOptions:
-  disableNameSuffixHash: true

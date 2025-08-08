@@ -1,9 +1,9 @@
-fullnameOverride: geography-storage
+fullnameOverride: storage
 
 extraVolumes:
   - name: scripts-volume
     configMap:
-      name: geography-storage-scripts
+      name: storage-scripts
 
 extraVolumeMounts:
   - name: scripts-volume
@@ -14,16 +14,16 @@ args:
   - /scripts/start.sh
 
 auth:
-  existingSecret: geography-storage-credentials
-  rootUserSecretKey: GEOGRAPHY_STORAGE_USERNAME
-  rootPasswordSecretKey: GEOGRAPHY_STORAGE_PASSWORD
+  existingSecret: storage-credentials
+  rootUserSecretKey: STORAGE_USERNAME
+  rootPasswordSecretKey: STORAGE_PASSWORD
 
 extraEnvVars:
   - name: MINIO_NOTIFY_AMQP_ENABLE_PRIMARY
     value: "on"
 
-extraEnvVarsCM: message-broker-config
-extraEnvVarsSecret: message-broker-credentials
+extraEnvVarsCM: storage-config
+extraEnvVarsSecret: storage-credentials
 
 persistence:
   enabled: false

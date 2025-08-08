@@ -1,7 +1,0 @@
-*
-
-!Cargo.toml
-!Cargo.lock
-!src/**/*.rs
-!*.wit
-!config.yaml

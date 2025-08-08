@@ -1,6 +1,6 @@
 packages:
   - apps/mobile
-  - services/geography/importer
+  - maps/packages/importer
 syncInjectedDepsAfterScripts:
 - build
 injectWorkspacePackages: true

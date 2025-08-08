@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: haydov-common
+  labels:
+    app.kubernetes.io/name: haydov-common
+    app.kubernetes.io/part-of: haydov

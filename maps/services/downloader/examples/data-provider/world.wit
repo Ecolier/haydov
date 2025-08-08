@@ -1,5 +1,0 @@
-package maps:data-provider;
-
-world data-provider {
-  export parse-urls: func(schema: list<u8>) -> list<string>;
-}
