@@ -1,7 +1,13 @@
 mod types;
 
-use anyhow::{Context, Result};
+use std::sync::Arc;
+
+use anyhow::{Context, Ok, Result};
+use aws_config::Region;
+use aws_sdk_s3::config::{http, Credentials};
 use config;
+use futures::{stream, StreamExt, TryStreamExt};
+use maps_utils::S3ClientExt;
 use types::Settings;
 use wasmtime_wasi::{
     ResourceTable,
@@ -89,25 +95,50 @@ async fn main() -> Result<()> {
         .context("Failed to get `parse-urls` function")?
         .typed::<(Vec<u8>,), (Vec<String>,)>(&mut store)?;
 
-    let (results,) = parse_urls.call(&mut store, (config_bytes,))?;
-    for url in results {
-        println!("Parsed URL: {}", url);
-    }
+    let (parsed_urls,) = parse_urls.call(&mut store, (config_bytes,))?;
 
-    // let storage_client = Arc::new(aws_sdk_s3::Client::from_conf(
-    //     aws_sdk_s3::config::Builder::new()
-    //         .endpoint_url(&config.storage.base_url.to_string())
-    //         .credentials_provider(Credentials::new(
-    //             &config.storage.username,
-    //             &config.storage.password,
-    //             None,
-    //             None,
-    //             "environment",
-    //         ))
-    //         .region(Region::new(config.storage.region.clone()))
-    //         .behavior_version_latest()
-    //         .force_path_style(true)
-    //         .build(),
-    // ));
+    let storage_client = Arc::new(aws_sdk_s3::Client::from_conf(
+        aws_sdk_s3::config::Builder::new()
+            .endpoint_url(&storage.base_url)
+            .credentials_provider(Credentials::new(
+                &storage.username,
+                &storage.password,
+                None,
+                None,
+                "environment",
+            ))
+            .region(Region::new(storage.region.clone()))
+            .behavior_version_latest()
+            .force_path_style(true)
+            .build(),
+    ));
+
+    let http_client = Arc::new(reqwest::Client::new());
+
+    // stream::iter(parsed_urls).for_each_concurrent(downloader.concurrent_requests, |url| {
+    // let http_client = http_client.clone();
+    // let storage_client = storage_client.clone();
+    // let bucket_name = downloader.bucket_name.clone();
+    // async move {
+    //     if let Err(e) = async {
+    //         let response = http_client
+    //             .get(&url)
+    //             .send()
+    //             .await.map_err(|e| maps_utils::Error::)?;
+    //         storage_client
+    //             .bucket(&bucket_name)
+    //             .upload_stream_object()
+    //             .chunk_size(downloader.chunk_size.unwrap_or(8 * 1024 * 1024)) // Default to 8MB if None
+    //             .key(url.split('/').last().unwrap_or("downloaded_file"))
+    //             .send(response.bytes_stream().map_err(|e| Box::new(maps_utils::Error::StreamError(Box::new(e))) as Box<dyn std::error::Error + Send + Sync>))
+    //             .await
+    //     }
+    //     .await
+    //     {
+    //         eprintln!("Error processing {}: {:?}", url, e);
+    //     }
+    // }
+    // }).await;
+
     Ok(())
 }

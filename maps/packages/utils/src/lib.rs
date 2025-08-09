@@ -1,3 +1,3 @@
 mod upload_stream;
 
-pub use upload_stream::S3ClientExt;
+pub use upload_stream::{Error, S3ClientExt};
