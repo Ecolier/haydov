@@ -31,11 +31,16 @@ let
 in {
   devShell = pkgs.mkShell {
     buildInputs = with pkgs; [
-      rustToolchain
-      docker docker-compose
-      kubectl kind kustomize tilt helm
-      git
-    ];
+      shared.rustToolchain  # ✅ Use shared.rustToolchain
+      docker
+      docker-compose
+      kubectl
+      kind
+      kustomize
+      tilt
+      helm
+    ] ++ shared.commonInputs;
+    
     shellHook = ''
       clear
       echo "🌟 Provisioning Kubernetes cluster..."
