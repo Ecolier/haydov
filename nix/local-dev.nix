@@ -4,45 +4,76 @@ let
   shared = import ./shared.nix { inherit pkgs; };
 
   packages = {
-    start-local-services = pkgs.writeShellScriptBin "start-local-services" ''
+    start-services = pkgs.writeShellScriptBin "start-services" ''
       echo "🚀 Starting local services..."
       
       # Create data directories
-      mkdir -p ~/.local/share/{postgres,redis,minio,rabbitmq}
-      
-      # Initialize PostgreSQL if needed
-      if [ ! -d ~/.local/share/postgres/data ]; then
-        echo "📊 Initializing PostgreSQL..."
-        initdb -D ~/.local/share/postgres/data
-      fi
-      
-      # Start services
-      echo "📊 Starting PostgreSQL..."
-      pg_ctl -D ~/.local/share/postgres/data -l ~/.local/share/postgres/postgres.log start || true
-      
-      echo "🗄️  Starting Redis..."
-      redis-server --daemonize yes --dir ~/.local/share/redis || true
-      
+      mkdir -p .dev/{minio,rabbitmq/{logs,mnesia,config}}
+
       echo "📦 Starting MinIO..."
-      minio server ~/.local/share/minio --console-address ":9001" &
+      MINIO_ROOT_USER=admin MINIO_ROOT_PASSWORD=minio_password \
+        minio server .dev/minio --console-address ":9001" &
+      echo $! > .dev/minio.pid
       
       echo "🐰 Starting RabbitMQ..."
-      rabbitmq-server -detached || true
+      export RABBITMQ_LOG_BASE="$(pwd)/.dev/rabbitmq/logs"
+      export RABBITMQ_MNESIA_BASE="$(pwd)/.dev/rabbitmq/mnesia"
+      export RABBITMQ_CONFIG_FILE="$(pwd)/.dev/rabbitmq/config/rabbitmq"
+      export RABBITMQ_ENABLED_PLUGINS_FILE="$(pwd)/.dev/rabbitmq/config/enabled_plugins"
+      export RABBITMQ_NODE_PORT=5672
+      export RABBITMQ_NODENAME=rabbit@localhost
+
+      touch .dev/rabbitmq/config/enabled_plugins
+      cat > .dev/rabbitmq/config/rabbitmq.conf << EOF
+        management.tcp.port = 15672
+        management.tcp.ip = 127.0.0.1
+        listeners.tcp.default = 5672
+        loopback_users = none
+      EOF
+
+      rabbitmq-server -detached
+
+      # Wait for RabbitMQ to be ready
+      echo "⏳ Waiting for RabbitMQ to start..."
+      max_attempts=30
+      attempt=0
+      
+      while [ $attempt -lt $max_attempts ]; do
+        if rabbitmqctl status >/dev/null 2>&1; then
+          echo "✅ RabbitMQ is ready!"
+          break
+        fi
+        
+        echo "   Attempt $((attempt + 1))/$max_attempts - waiting 2s..."
+        sleep 2
+        attempt=$((attempt + 1))
+      done
+      
+      if [ $attempt -eq $max_attempts ]; then
+        echo "❌ RabbitMQ failed to start within 60 seconds"
+        exit 1
+      fi
+      
+      # Enable management plugin
+      echo "🔧 Enabling RabbitMQ management plugin..."
+      rabbitmq-plugins enable rabbitmq_management
       
       echo "✅ Local services started"
     '';
 
-    stop-local-services = pkgs.writeShellScriptBin "stop-local-services" ''
+    stop-services = pkgs.writeShellScriptBin "stop-services" ''
       echo "🛑 Stopping local services..."
-      
-      echo "📊 Stopping PostgreSQL..."
-      pg_ctl -D ~/.local/share/postgres/data stop || true
-      
-      echo "🗄️  Stopping Redis..."
-      redis-cli shutdown || true
+
+      export RABBITMQ_LOG_BASE="$(pwd)/.dev/rabbitmq/logs"
+      export RABBITMQ_MNESIA_BASE="$(pwd)/.dev/rabbitmq/mnesia"
+      export RABBITMQ_NODENAME=rabbit@localhost
       
       echo "📦 Stopping MinIO..."
-      pkill -f minio || true
+      if [ -f .dev/minio.pid ]; then
+        kill $(cat .dev/minio.pid) 2>/dev/null || true
+        rm .dev/minio.pid
+      fi
+      pkill -f "minio server" || true
       
       echo "🐰 Stopping RabbitMQ..."
       rabbitmqctl stop || true
@@ -56,37 +87,34 @@ in {
     buildInputs = with pkgs; [
       shared.rustToolchain  # ✅ Use shared.rustToolchain, not rustToolchain
       nodejs_20
-      postgresql_15
-      redis
       minio
       rabbitmq-server
+      erlang
     ] ++ shared.commonInputs;
     
     shellHook = ''
       echo "🏠 Local development environment ready!"
       echo ""
       echo "Services available:"
-      echo "  📊 PostgreSQL: localhost:5432"
-      echo "  🗄️  Redis: localhost:6379"
       echo "  📦 MinIO: localhost:9000 (console: localhost:9001)"
       echo "  🐰 RabbitMQ: localhost:5672 (management: localhost:15672)"
       echo ""
       echo "Commands:"
-      echo "  start-local-services  # Start all services"
-      echo "  stop-local-services   # Stop all services"
+      echo "  start-services  # Start all services"
+      echo "  stop-services   # Stop all services"
     '';
   };
 
   inherit packages;
 
   apps = {
-    start-local = {
+    start-services = {
       type = "app";
-      program = "${packages.start-local-services}/bin/start-local-services";
+      program = "${packages.start-services}/bin/start-services";
     };
-    stop-local = {
+    stop-services = {
       type = "app";
-      program = "${packages.stop-local-services}/bin/stop-local-services";
+      program = "${packages.stop-services}/bin/stop-services";
     };
   };
 }

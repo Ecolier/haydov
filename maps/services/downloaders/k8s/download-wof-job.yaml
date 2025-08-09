@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-wof-job
+  namespace: haydov-maps
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: wof-downloader
+          image: haydov/maps-downloader
+          command: ["maps-downloader"]
+          env:
+            - name: CONFIG_PATH
+              value: "/data-provider/config.yaml"
+          volumeMounts:
+            - name: plugin-volume
+              mountPath: /data-provider
+      volumes:
+        - name: plugin-volume
+          configMap:
+            name: osm-provider-plugin

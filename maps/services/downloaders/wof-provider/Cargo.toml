@@ -1,7 +1,7 @@
 [workspace]
 
 [package]
-name = "data-provider"
+name = "wof-provider"
 version = "0.1.0"
 edition = "2024"
 

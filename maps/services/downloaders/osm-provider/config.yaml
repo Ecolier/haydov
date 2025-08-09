@@ -1,0 +1,9 @@
+component: ./target/wasm32-wasip2/release/data_provider.wasm
+schema:
+  base_url: https://download.geofabrik.de
+  filename_template: "{region}-latest.osm.pbf"
+  regions:
+    - europe/montenegro
+    - europe/malta
+    - europe/macedonia
+    - europe/france/guyane

@@ -1,0 +1,9 @@
+component: /data-provider/data_provider.wasm
+schema:
+  base_url: https://data.geocode.earth/wof/dist/sqlite
+  filename_template: "whosonfirst-data-admin-{region}-latest.db.bz2"
+  regions:
+    - ME
+    - MT
+    - MK
+    - FR
