@@ -7,7 +7,6 @@ configMapGenerator:
   - name: osm-provider-plugin
     files:
       - ./plugin/config.yaml
-      - ./plugin/world.wit
       - ./target/wasm32-wasip2/release/data_provider.wasm
 
 generatorOptions:

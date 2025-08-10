@@ -1,0 +1,6 @@
+concurrent_requests: 4
+chunk_size: 5242880
+
+storage:
+  base_url: localhost:9000
+  region: us-east-1

@@ -1,9 +1,0 @@
-concurrent_requests: 4
-chunk_size: 5242880 # 5 MB
-bucket_name: osm-data
-
-storage:
-  base_url: localhost:9000
-  region: us-east-1
-  username: minio
-  password: minio123

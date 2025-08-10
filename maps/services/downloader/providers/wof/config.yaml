@@ -1,4 +1,5 @@
-component: /data-provider/data_provider.wasm
+bucket_name: wof-data
+component: ../../target/wasm32-wasip2/debug/wof_provider.wasm
 schema:
   base_url: https://data.geocode.earth/wof/dist/sqlite
   filename_template: "whosonfirst-data-admin-{region}-latest.db.bz2"

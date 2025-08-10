@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 use anyhow::{Context, Ok, Result};
 use aws_config::Region;
-use aws_sdk_s3::config::{http, Credentials};
+use aws_sdk_s3::config::{Credentials, http};
 use config;
-use futures::{stream, StreamExt, TryStreamExt};
+use futures::{StreamExt, TryStreamExt, stream};
 use maps_utils::S3ClientExt;
 use types::Settings;
 use wasmtime_wasi::{
@@ -37,9 +37,12 @@ impl WasiView for DataProviderState {
 async fn main() -> Result<()> {
     let config_path =
         std::env::var("CONFIG_PATH").unwrap_or_else(|_| "/app/config.yaml".to_string());
+    let provider_config_path: String = std::env::var("PROVIDER_CONFIG_PATH")
+        .unwrap_or_else(|_| "/app/provider_config.yaml".to_string());
 
     let config = config::Config::builder()
         .add_source(config::File::with_name(&config_path))
+        .add_source(config::File::with_name(&provider_config_path))
         .add_source(config::Environment::default())
         .build()
         .context("Failed to build configuration")?;
@@ -51,17 +54,18 @@ async fn main() -> Result<()> {
     } = config.try_deserialize::<Settings>()?;
 
     // Get the directory containing the config file
-    let config_dir = std::path::Path::new(&config_path)
+    let config_dir = std::path::Path::new(&provider_config_path)
         .parent()
         .unwrap_or_else(|| std::path::Path::new("."));
 
-     // Resolve component path relative to config directory
+    // Resolve component path relative to config directory
     let component_path = if std::path::Path::new(&provider.component).is_absolute() {
         // If already absolute, use as-is
         provider.component.clone()
     } else {
         // Make it relative to config directory
-        config_dir.join(&provider.component)
+        config_dir
+            .join(&provider.component)
             .to_string_lossy()
             .to_string()
     };
@@ -71,10 +75,10 @@ async fn main() -> Result<()> {
     }
 
     let engine = Engine::default();
-    
+
     let component =
         Component::from_file(&engine, &component_path).context("Failed to load component")?;
-        
+
     let mut linker = Linker::new(&engine);
     add_to_linker_sync(&mut linker)?;
 
@@ -96,6 +100,8 @@ async fn main() -> Result<()> {
         .typed::<(Vec<u8>,), (Vec<String>,)>(&mut store)?;
 
     let (parsed_urls,) = parse_urls.call(&mut store, (config_bytes,))?;
+
+    println!("Parsed URLs: {:#?}", parsed_urls);
 
     let storage_client = Arc::new(aws_sdk_s3::Client::from_conf(
         aws_sdk_s3::config::Builder::new()

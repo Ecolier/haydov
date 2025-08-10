@@ -3,7 +3,7 @@
   description = "Haydov development environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
@@ -14,18 +14,18 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
         
-        localDev = import ./nix/local-dev.nix { inherit pkgs; };
-        k8sDev = import ./nix/k8s-dev.nix { inherit pkgs; };
+        local = import ./nix/local/shell.nix { inherit pkgs; };
+        k8s = import ./nix/k8s/shell.nix { inherit pkgs; };
         
       in {
         devShells = {
-          default = k8sDev.devShell;
-          local = localDev.devShell;
-          k8s = k8sDev.devShell;
+          default = k8s.devShell;
+          local = local.devShell;
+          k8s = k8s.devShell;
         };
         
-        packages = localDev.packages // k8sDev.packages;
-        apps = localDev.apps // k8sDev.apps;
+        packages = local.packages // k8s.packages;
+        apps = local.apps // k8s.apps;
 
         # Add formatter for `nix fmt`
         formatter = pkgs.nixpkgs-fmt;

@@ -1,11 +1,23 @@
 # nix/local-dev.nix
 { pkgs }:
 let
-  shared = import ./shared.nix { inherit pkgs; };
+  shared = import ../shared.nix { inherit pkgs; };
+  envUtils = import ../utils.nix { inherit pkgs; };
+  envConfig = import ./env.nix;
+  
+  allEnvVars = envUtils.mergeEnvConfigs [
+    envConfig.infrastructure
+    envConfig.runtime
+    envConfig.secrets
+  ];
+
+  envString = envUtils.envToShellExports allEnvVars;
 
   packages = {
     start-services = pkgs.writeShellScriptBin "start-services" ''
       echo "🚀 Starting local services..."
+
+      ${envString}
       
       # Create data directories
       mkdir -p .dev/{minio,rabbitmq/{logs,mnesia,config}}
@@ -22,6 +34,7 @@ let
       export RABBITMQ_ENABLED_PLUGINS_FILE="$(pwd)/.dev/rabbitmq/config/enabled_plugins"
       export RABBITMQ_NODE_PORT=5672
       export RABBITMQ_NODENAME=rabbit@localhost
+      export ERL_CRASH_DUMP="$(pwd)/.dev/rabbitmq/erl_crash.dump"
 
       touch .dev/rabbitmq/config/enabled_plugins
       cat > .dev/rabbitmq/config/rabbitmq.conf << EOF
@@ -80,6 +93,15 @@ let
       
       echo "✅ Local services stopped"
     '';
+
+    clean-services = pkgs.writeShellScriptBin "clean-services" ''
+      echo "🧹 Cleaning local services..."
+      
+      ${packages.stop-services}/bin/stop-services
+      rm -rf .dev
+      
+      echo "✅ Local services cleaned"
+    '';
   };
 
 in {
@@ -102,6 +124,7 @@ in {
       echo "Commands:"
       echo "  start-services  # Start all services"
       echo "  stop-services   # Stop all services"
+      echo "  clean-services  # Clean all data"
     '';
   };
 
@@ -115,6 +138,10 @@ in {
     stop-services = {
       type = "app";
       program = "${packages.stop-services}/bin/stop-services";
+    };
+    clean-services = {
+      type = "app";
+      program = "${packages.clean-services}/bin/clean-services";
     };
   };
 }

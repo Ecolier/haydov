@@ -3,7 +3,9 @@ use serde_json::Value;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
+    #[serde(flatten)]
     pub downloader: DownloaderConfig,
+    #[serde(flatten)]
     pub provider: ProviderConfig,
     pub storage: StorageConfig,
 }
@@ -12,7 +14,6 @@ pub struct Settings {
 pub struct DownloaderConfig {
     pub concurrent_requests: Option<usize>,
     pub chunk_size: Option<usize>,
-    pub bucket_name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -25,6 +26,7 @@ pub struct StorageConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct ProviderConfig {
+    pub bucket_name: String,
     pub component: String,
     pub schema: Value,
 }
