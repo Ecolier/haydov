@@ -1,7 +1,7 @@
 # nix/k8s-dev.nix
 { pkgs }:
 let
-  shared = import ./shared.nix { inherit pkgs; };
+  shared = import ../shared.nix { inherit pkgs; };
 
   packages = {
     deploy = pkgs.writeShellScriptBin "deploy" ''
@@ -38,7 +38,7 @@ in {
       kind
       kustomize
       tilt
-      helm
+      kubernetes-helm
     ] ++ shared.commonInputs;
     
     shellHook = ''

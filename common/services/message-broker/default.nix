@@ -3,9 +3,13 @@ let
   start-message-broker = pkgs.writeShellScriptBin "start-message-broker" ''
     echo "🐰 Starting message broker..."
 
-    ${env}
-    
-    mkdir -p .dev/rabbitmq/{logs,mnesia,config}
+    SERVICE_DIR="${./.}"
+    cd "$SERVICE_DIR"
+
+    direnv allow 2>/dev/null || true
+    env
+
+    mkdir -p "$(pwd)/.dev/rabbitmq/{logs,mnesia,config}"
     
     export RABBITMQ_LOG_BASE="$(pwd)/.dev/rabbitmq/logs"
     export RABBITMQ_MNESIA_BASE="$(pwd)/.dev/rabbitmq/mnesia"
@@ -19,10 +23,10 @@ let
     cat > .dev/rabbitmq/config/rabbitmq.conf << EOF
       management.tcp.port = 15672
       management.tcp.ip = 127.0.0.1
-      listeners.tcp.default = 5672
+      listeners.tcp.default = $MESSAGE_BROKER_PORT
       loopback_users = none
-      default_user = $COMMON_MESSAGE_BROKER_USERNAME
-      default_pass = $COMMON_MESSAGE_BROKER_PASSWORD
+      default_user = $MESSAGE_BROKER_USERNAME
+      default_pass = $MESSAGE_BROKER_PASSWORD
     EOF
 
     exec ${pkgs.bash}/bin/bash ${./scripts/start.sh} "$@"

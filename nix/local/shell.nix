@@ -25,14 +25,18 @@ in {
       rabbitmq-server
       erlang
       bacon
+      direnv
     ] ++ shared.commonInputs;
     
     shellHook = ''
+      eval "$(direnv hook bash)"
+      direnv allow
+
       echo "🏠 Local development environment ready!"
       echo ""
       echo "Services available:"
-      echo "  📦 MinIO: localhost:9000 (console: localhost:9001)"
-      echo "  🐰 RabbitMQ: localhost:5672 (management: localhost:15672)"
+      echo "  📦 Maps storage: localhost:9000 (console: localhost:9001)"
+      echo "  🐰 Message broker: localhost:5672 (management: localhost:15672)"
       echo ""
       echo "Commands:"
       echo "  start-services  # Start all services"

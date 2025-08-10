@@ -8,6 +8,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 .dev/
+.direnv/
 
 # MacOS specifics
 .DS_Store
