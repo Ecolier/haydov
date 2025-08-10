@@ -37,13 +37,14 @@ impl WasiView for DataProviderState {
 async fn main() -> Result<()> {
     let config_path =
         std::env::var("CONFIG_PATH").unwrap_or_else(|_| "/app/config.yaml".to_string());
+
     let provider_config_path: String = std::env::var("PROVIDER_CONFIG_PATH")
         .unwrap_or_else(|_| "/app/provider_config.yaml".to_string());
 
     let config = config::Config::builder()
         .add_source(config::File::with_name(&config_path))
         .add_source(config::File::with_name(&provider_config_path))
-        .add_source(config::Environment::default())
+        .add_source(config::Environment::default().separator("_"))
         .build()
         .context("Failed to build configuration")?;
 

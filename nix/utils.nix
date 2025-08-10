@@ -1,4 +1,3 @@
-# nix/lib/env-utils.nix
 { pkgs }:
 {
   # Convert attribute set to shell environment exports

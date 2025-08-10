@@ -15,8 +15,8 @@
   # Secrets for local development
   secrets = {
     MAPS_STORAGE_USERNAME = "admin";
-    MAPS_STORAGE_PASSWORD = "minio_password";
-    COMMON_MESSAGE_BROKER_USERNAME = "guest";
-    COMMON_MESSAGE_BROKER_PASSWORD = "guest";
+    MAPS_STORAGE_PASSWORD = "password";
+    COMMON_MESSAGE_BROKER_USERNAME = "admin";
+    COMMON_MESSAGE_BROKER_PASSWORD = "password";
   };
 }
