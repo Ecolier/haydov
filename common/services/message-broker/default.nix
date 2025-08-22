@@ -1,15 +1,9 @@
-{ pkgs, env }:
+{ pkgs }:
 let
   start-message-broker = pkgs.writeShellScriptBin "start-message-broker" ''
     echo "🐰 Starting message broker..."
 
-    SERVICE_DIR="${./.}"
-    cd "$SERVICE_DIR"
-
-    direnv allow 2>/dev/null || true
-    env
-
-    mkdir -p "$(pwd)/.dev/rabbitmq/{logs,mnesia,config}"
+    mkdir -p ./.dev/rabbitmq/{logs,mnesia,config}
     
     export RABBITMQ_LOG_BASE="$(pwd)/.dev/rabbitmq/logs"
     export RABBITMQ_MNESIA_BASE="$(pwd)/.dev/rabbitmq/mnesia"
@@ -50,11 +44,45 @@ let
     echo "🧹 Cleaning message broker..."
     
     ${stop-message-broker}/bin/stop-message-broker
-    rm -rf .dev/rabbitmq
+    rm -rf .dev/
     
     echo "✅ Message broker cleaned"
   '';
 
 in {
-  inherit start-message-broker stop-message-broker clean-message-broker;
+  devShell = pkgs.mkShell {
+    buildInputs = with pkgs; [
+      rabbitmq-server
+      erlang
+    ];
+    
+    shellHook = ''
+      echo "🐰 Message broker: localhost:5672 (management: localhost:15672)"
+      echo ""
+      echo "Commands:"
+      echo "  start-message-broker"
+      echo "  stop-message-broker"
+      echo "  clean-message-broker"
+      echo ""
+    '';
+  };
+
+  packages = {
+    inherit start-message-broker stop-message-broker clean-message-broker;
+  };
+  
+  apps = {
+    start-message-broker = {
+      type = "app";
+      program = "${start-message-broker}/bin/start-message-broker";
+    };
+    stop-message-broker = {
+      type = "app";
+      program = "${stop-message-broker}/bin/stop-message-broker";
+    };
+    clean-message-broker = {
+      type = "app";
+      program = "${clean-message-broker}/bin/clean-message-broker";
+    };
+  };
 }

@@ -1,16 +1,22 @@
 #!/bin/bash
 
-echo "$STORAGE_BASE_URL" "$STORAGE_USERNAME" "$STORAGE_PASSWORD"
+set -euxo pipefail
+
 until mc alias set local $STORAGE_BASE_URL "$STORAGE_USERNAME" "$STORAGE_PASSWORD"; do
   echo "Waiting for MinIO..."
   sleep 2
 done
 
-mc ls local/$RAW_BUCKET_NAME || mc mb local/$RAW_BUCKET_NAME
-mc ls local/$PROCESSED_BUCKET_NAME || mc mb local/$PROCESSED_BUCKET_NAME
-
-mc admin info --json local | jq -r '(.info.sqsARN // [])[]' | while read -r arn; do
-  [ -n "$(mc event ls local/$RAW_BUCKET_NAME "$arn")" ] || mc event add local/$RAW_BUCKET_NAME "$arn" --event put
+# Create buckets if they don't exist
+for var in $(env | grep '^BUCKET_NAME_' | cut -d= -f1); do
+  bucket="${!var}"
+  mc ls "local/$bucket" || mc mb "local/$bucket"
 done
 
-tail -f /dev/null
+# Iterate over all buckets for event setup
+for var in $(env | grep '^BUCKET_NAME_' | cut -d= -f1); do
+  bucket="${!var}"
+  mc admin info --json local | jq -r '(.info.sqsARN // [])[]' | while read -r arn; do
+    [ -n "$(mc event ls local/$bucket "$arn")" ] || mc event add local/$bucket "$arn" --event put
+  done
+done
